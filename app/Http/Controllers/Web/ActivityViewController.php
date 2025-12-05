@@ -26,7 +26,7 @@ class ActivityViewController extends Controller
             $query->byCategory($request->category_id);
         }
         
-        $activities = $query->paginate(50);
+        $activities = $query->limit(1000)->get();
         $categories = Category::active()->get();
         
         return view('performance.activities.index', compact('activities', 'categories'));
@@ -37,7 +37,8 @@ class ActivityViewController extends Controller
         $activities = Activity::tagged()
             ->with('categories')
             ->orderBy('start_time_utc', 'desc')
-            ->paginate(50);
+            ->limit(1000)
+            ->get();
         $categories = Category::active()->get();
         
         return view('performance.activities.tagged', compact('activities', 'categories'));
@@ -47,10 +48,13 @@ class ActivityViewController extends Controller
     {
         $activities = Activity::untagged()
             ->orderBy('start_time_utc', 'desc')
-            ->paginate(50);
+            ->limit(1000)
+            ->get();
         $categories = Category::active()->get();
         
-        return view('performance.activities.untagged', compact('activities', 'categories'));
+        $totalCount = Activity::untagged()->count();
+        
+        return view('performance.activities.untagged', compact('activities', 'categories', 'totalCount'));
     }
 
     public function autoTagPage()

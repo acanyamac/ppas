@@ -3,6 +3,7 @@
 @section('title', 'Aktiviteler')
 
 @section('css')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
 @endsection
 
 @section('breadcrumb-title')
@@ -54,9 +55,10 @@
                     </form>
 
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="basic-1">
                             <thead>
                                 <tr>
+                                    <th>Kullanıcı</th>
                                     <th>Process Name</th>
                                     <th>Başlık</th>
                                     <th>Kategoriler</th>
@@ -67,6 +69,9 @@
                             <tbody>
                                 @forelse($activities as $activity)
                                 <tr>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ $activity->username }}</span>
+                                    </td>
                                     <td><code>{{ Str::limit($activity->process_name, 30) }}</code></td>
                                     <td>{{ Str::limit($activity->title, 50) }}</td>
                                     <td>
@@ -83,19 +88,31 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">Aktivite bulunamadı</td>
+                                    <td colspan="6" class="text-center">Aktivite bulunamadı</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="d-flex justify-content-center mt-3">
-                        {{ $activities->links() }}
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#basic-1').DataTable({
+                "pageLength": 50,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+                }
+            });
+        });
+    </script>
 @endsection

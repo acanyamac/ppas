@@ -118,7 +118,9 @@
                     <h5>İş / Diğer Dağılımı</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="workOtherChart" height="200"></canvas>
+                    <div style="height: 200px;">
+                        <canvas id="workOtherChart"></canvas>
+                    </div>
                     <div class="mt-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span><i class="fa fa-circle text-primary"></i> İş</span>

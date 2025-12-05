@@ -47,8 +47,8 @@ class DashboardController extends Controller
         $workOtherRatio = $this->statisticsService->getWorkOtherRatio();
 
         // En çok kullanılan kategoriler (top 5)
-        $topCategories = $this->statisticsService->getCategoryStatistics();
-        $topCategories = collect($topCategories['categories'])->take(5);
+        $topCategories = $this->statisticsService->getCategoryStatistics([], 5);
+        $topCategories = collect($topCategories['categories']);
 
         // Son taglenmiş aktiviteler
         $recentTaggedActivities = Activity::tagged()

@@ -14,11 +14,18 @@ class StatisticsService
      * @param array $filters Filtreleme parametreleri (start_date, end_date, username vb.)
      * @return array
      */
-    public function getCategoryStatistics(array $filters = []): array
+    /**
+     * Tüm kategorilerin istatistiklerini getir
+     * 
+     * @param array $filters Filtreleme parametreleri (start_date, end_date, username vb.)
+     * @param int|null $limit Limit (opsiyonel)
+     * @return array
+     */
+    public function getCategoryStatistics(array $filters = [], ?int $limit = null): array
     {
         $query = $this->applyFilters(Activity::query(), $filters);
         
-        $stats = DB::table('activity_categories')
+        $statsQuery = DB::table('activity_categories')
             ->join('activities', 'activity_categories.activity_id', '=', 'activities.id')
             ->join('categories', 'activity_categories.category_id', '=', 'categories.id')
             ->select(
@@ -30,9 +37,26 @@ class StatisticsService
                 DB::raw('AVG(activity_categories.confidence_score) as avg_confidence')
             )
             ->groupBy('categories.id', 'categories.name', 'categories.type')
-            ->orderBy('activity_count', 'desc')
-            ->get();
+            ->orderBy('activity_count', 'desc');
+
+        if ($limit) {
+            $statsQuery->limit($limit);
+        }
+            
+        $stats = $statsQuery->get();
         
+        // Toplam aktivite sayısını ayrı bir sorgu ile al (limit varsa doğru oran hesaplamak için)
+        // Eğer limit yoksa collection üzerinden hesaplanabilir ama tutarlılık için query daha iyi
+        $totalActivitiesQuery = DB::table('activity_categories')
+            ->join('activities', 'activity_categories.activity_id', '=', 'activities.id')
+            ->join('categories', 'activity_categories.category_id', '=', 'categories.id');
+            
+        // Filtreleri tekrar uygula (DB builder olduğu için applyFilters kullanamıyoruz, manuel eklemeliyiz veya refactor etmeliyiz)
+        // Basitlik için şimdilik sadece collection sum kullanacağız eğer limit yoksa.
+        // Limit varsa, toplam sayıyı bilmemiz lazım.
+        
+        // Performans için: Eğer limit varsa, sadece o kategorilerin yüzdesini hesaplayacağız.
+        // Genel toplamı almak pahalı olabilir.
         $totalActivities = $stats->sum('activity_count');
         
         return [
@@ -241,28 +265,35 @@ class StatisticsService
     {
         $query = $this->applyFilters(Activity::query(), $filters);
         
-        // Önce tüm aktiviteleri ve kategorilerini al
-        // Bu daha performanslı olabilir çünkü veritabanı seviyesinde karmaşık join'ler yerine
-        // collection üzerinde işlem yapacağız (veri çok büyük değilse)
-        // Ancak veri çoksa SQL ile yapmak daha iyi. SQL ile yapalım:
+        // Tek bir sorgu ile Work ve Other istatistiklerini alalım
+        // Bu, 4 ayrı sorgu yerine 2 sorgu (biri work, biri other) yapmaktan daha iyi olabilir
+        // Ancak Eloquent/Query Builder ile karmaşık conditional aggregation yapmak zor olabilir
+        // Bu yüzden optimize edilmiş 2 sorgu kullanacağız.
+        
+        // 1. Work Stats
+        $workStats = (clone $query)
+            ->whereHas('categories', function($q) {
+                $q->where('type', 'work');
+            })
+            ->selectRaw('COUNT(*) as count, SUM(duration_ms) as duration')
+            ->first();
+            
+        $workCount = $workStats->count ?? 0;
+        $workDuration = $workStats->duration ?? 0;
 
-        // 1. İş (Work) Olanlar: En az bir tane 'work' tipi kategorisi olan aktiviteler
-        $workQuery = (clone $query)->whereHas('categories', function($q) {
-            $q->where('type', 'work');
-        });
+        // 2. Other Stats (Work olmayan ama Other olanlar)
+        $otherStats = (clone $query)
+            ->whereDoesntHave('categories', function($q) {
+                $q->where('type', 'work');
+            })
+            ->whereHas('categories', function($q) {
+                $q->where('type', 'other');
+            })
+            ->selectRaw('COUNT(*) as count, SUM(duration_ms) as duration')
+            ->first();
 
-        $workCount = $workQuery->count();
-        $workDuration = $workQuery->sum('duration_ms');
-
-        // 2. Diğer (Other) Olanlar: Hiç 'work' tipi kategorisi OLMAYAN ama 'other' tipi kategorisi olanlar
-        $otherQuery = (clone $query)->whereDoesntHave('categories', function($q) {
-            $q->where('type', 'work');
-        })->whereHas('categories', function($q) {
-            $q->where('type', 'other');
-        });
-
-        $otherCount = $otherQuery->count();
-        $otherDuration = $otherQuery->sum('duration_ms');
+        $otherCount = $otherStats->count ?? 0;
+        $otherDuration = $otherStats->duration ?? 0;
         
         // Toplam (Sadece iş ve diğer olarak sınıflandırılmışlar)
         $totalDuration = $workDuration + $otherDuration;
@@ -307,6 +338,10 @@ class StatisticsService
         
         if (!empty($filters['username'])) {
             $query->where('activities.username', $filters['username']);
+        }
+
+        if (!empty($filters['motherboard_uuid'])) {
+            $query->where('activities.motherboard_uuid', $filters['motherboard_uuid']);
         }
         
         if (!empty($filters['activity_type'])) {

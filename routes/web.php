@@ -124,6 +124,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('statistics-tagging-rate', [\App\Http\Controllers\Web\StatisticsViewController::class, 'taggingRate'])->name('statistics.tagging-rate');
         Route::get('statistics-time-distribution', [\App\Http\Controllers\Web\StatisticsViewController::class, 'timeDistribution'])->name('statistics.time-distribution');
         Route::get('statistics-work-other', [\App\Http\Controllers\Web\StatisticsViewController::class, 'workOther'])->name('statistics.work-other');
+        
+        // Computer Users
+        Route::resource('computer-users', \App\Http\Controllers\Web\ComputerUserController::class);
     });
     
     Route::resource('birim', UnitController::class);

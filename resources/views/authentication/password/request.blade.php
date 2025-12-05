@@ -20,7 +20,11 @@
             <div class="col-12">
                <div class="login-card">
                   <div>
-                     <div><a class="logo" href="{{ route('/') }}"><img class="img-fluid for-light" src="{{asset('assets/images/logo/login.png')}}" alt="looginpage"><img class="img-fluid for-dark" src="{{asset('assets/images/logo/logo_dark.png')}}" alt="looginpage"></a></div>
+                     <div class="text-center mb-4">
+                        <a class="logo" href="{{ route('/') }}">
+                           <img class="img-fluid" src="{{asset('assets/images/logo/logo.png')}}" alt="Perfas" style="max-height: 80px;">
+                        </a>
+                     </div>
                      <div class="login-main">
                         <form class="theme-form" action="{{route('password.email')}}" method="POST">
                            @csrf

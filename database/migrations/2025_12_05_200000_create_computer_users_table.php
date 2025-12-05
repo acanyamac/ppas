@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('entity_main_groups', function (Blueprint $table) {
+        Schema::create('computer_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('group_no');
+            $table->string('username');
+            $table->string('motherboard_uuid')->nullable();
+            $table->string('name')->nullable(); // Display name (alias)
             $table->timestamps();
+
+            $table->unique(['username', 'motherboard_uuid']);
         });
     }
 
@@ -24,8 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('entity_main_groups');
+        Schema::dropIfExists('computer_users');
     }
 };
-
-

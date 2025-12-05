@@ -19,7 +19,7 @@
     @yield('style')
   </head>
   {{-- @dd(Route::current()->getName()); --}}
-  <body @if(Route::current()->getName() == 'index') onload="startTime()" @elseif (Route::current()->getName() == 'button-builder') class="button-builder" @endif>
+  <body @if(Route::current()->getName() == 'button-builder') class="button-builder" @endif>
     <div class="loader-wrapper">
       <div class="loader-index"><span></span></div>
       <svg>

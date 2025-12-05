@@ -29,14 +29,11 @@
                         </div>
                     </li>
 
+                    {{-- Dashboard --}}
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title" href="{{ route('dashboard') }}">
-                            <svg class="stroke-icon">
-                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
-                            </svg>
-                            <svg class="fill-icon">
-                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use>
-                            </svg>
+                            <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use></svg>
+                            <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use></svg>
                             <span>Dashboard</span>
                         </a>
                     </li>
@@ -127,102 +124,22 @@
                         </div>
                     </li>
 
-                    @haspermission('Raporlar')
-                        <li class="mega-menu sidebar-list">
-                            <i class="fa fa-thumb-tack"></i>
-                            <a class="sidebar-link sidebar-title" href="#">
-                                <svg class="stroke-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-form') }}"></use>
-                                </svg>
-                                <svg class="fill-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#fill-form') }}"></use>
-                                </svg>
-                                <span>Rapor İşlemleri</span>
-                            </a>
-                            <div class="mega-menu-container menu-content">
-                                <div class="container-fluid">
-                                    <div class="row">
-                                        <div class="col mega-box">
-                                            <div class="link-section">
-                                                <div class="submenu-title">
-                                                    <h5>Raporlar</h5>
-                                                </div>
-                                                <ul class="submenu-content opensubmegamenu">
-                                                    <li><a href="{{ route('denetim-raporlari.index') }}">Denetim
-                                                            Raporları</a></li>
-                                                    <li><a href="{{ route('denetim-gorusu.index') }}">Denetim Görüşleri</a>
-                                                    </li>
-                                                    <li><a href="{{ route('denetim-gorusu.create') }}">Denetim Görüşü
-                                                            Oluştur</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        @haspermission('Çalışma Formları')
-                                            <div class="col mega-box">
-                                                <div class="link-section">
-                                                    <div class="submenu-title">
-                                                        <h5>Çalışma Formları</h5>
-                                                    </div>
-                                                    <ul class="submenu-content opensubmegamenu">
-                                                        <li><a href="{{ route('calisma-formlari.index') }}">Listele</a></li>
-                                                        <li><a href="{{ route('calisma-formlari.create') }}">Ekle</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        @endhaspermission
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endhaspermission
 
-                    @haspermission('Servis İstekleri')
-                        <li class="mega-menu sidebar-list">
-                            <i class="fa fa-thumb-tack"></i>
-                            <a class="sidebar-link sidebar-title" href="#">
-                                <svg class="stroke-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-to-do') }}"></use>
-                                </svg>
-                                <svg class="fill-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#fill-to-do') }}"></use>
-                                </svg>
-                                <span>Servis İşlemleri</span>
-                            </a>
-                            <div class="mega-menu-container menu-content">
-                                <div class="container-fluid">
-                                    <div class="row">
-                                        <div class="col mega-box">
-                                            <div class="link-section">
-                                                <div class="submenu-title">
-                                                    <h5>Servis İstekleri</h5>
-                                                </div>
-                                                <ul class="submenu-content opensubmegamenu">
-                                                    <li><a href="{{ route('service_requests.index') }}">Servis
-                                                            Talepleri</a></li>
-                                                    <li><a href="{{ route('service_requests.create') }}">Yeni Servis
-                                                            Talebi</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endhaspermission
+
+
 
                     {{-- Performance Agent Menüleri --}}
+                    {{-- Kategori Yönetimi --}}
                     <li class="mega-menu sidebar-list">
                         <i class="fa fa-thumb-tack"></i>
                         <a class="sidebar-link sidebar-title" href="#">
                             <svg class="stroke-icon">
-                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-board') }}"></use>
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-layout') }}"></use>
                             </svg>
                             <svg class="fill-icon">
-                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-board') }}"></use>
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-layout') }}"></use>
                             </svg>
-                            <span>Performance Agent</span>
+                            <span>Kategori Yönetimi</span>
                         </a>
                         <div class="mega-menu-container menu-content">
                             <div class="container-fluid">
@@ -230,7 +147,7 @@
                                     <div class="col mega-box">
                                         <div class="link-section">
                                             <div class="submenu-title">
-                                                <h5>Kategori Yönetimi</h5>
+                                                <h5>Kategoriler</h5>
                                             </div>
                                             <ul class="submenu-content opensubmegamenu">
                                                 <li><a href="{{ route('categories.index') }}">Kategoriler</a></li>
@@ -238,11 +155,30 @@
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
 
+                    {{-- Keyword Yönetimi --}}
+                    <li class="mega-menu sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title" href="#">
+                            <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-ui-kits') }}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-ui-kits') }}"></use>
+                            </svg>
+                            <span>Keyword Yönetimi</span>
+                        </a>
+                        <div class="mega-menu-container menu-content">
+                            <div class="container-fluid">
+                                <div class="row">
                                     <div class="col mega-box">
                                         <div class="link-section">
                                             <div class="submenu-title">
-                                                <h5>Keyword Yönetimi</h5>
+                                                <h5>Keywords</h5>
                                             </div>
                                             <ul class="submenu-content opensubmegamenu">
                                                 <li><a href="{{ route('keywords.index') }}">Keyword'ler</a></li>
@@ -252,11 +188,30 @@
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
 
+                    {{-- Aktivite Yönetimi --}}
+                    <li class="mega-menu sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title" href="#">
+                            <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-task') }}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-task') }}"></use>
+                            </svg>
+                            <span>Aktivite Yönetimi</span>
+                        </a>
+                        <div class="mega-menu-container menu-content">
+                            <div class="container-fluid">
+                                <div class="row">
                                     <div class="col mega-box">
                                         <div class="link-section">
                                             <div class="submenu-title">
-                                                <h5>Aktivite Yönetimi</h5>
+                                                <h5>Aktiviteler</h5>
                                             </div>
                                             <ul class="submenu-content opensubmegamenu">
                                                 <li><a href="{{ route('activities.index') }}">Tüm Aktiviteler</a></li>
@@ -266,11 +221,30 @@
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
 
+                    {{-- İstatistik & Raporlar --}}
+                    <li class="mega-menu sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title" href="#">
+                            <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-charts') }}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-charts') }}"></use>
+                            </svg>
+                            <span>İstatistik & Raporlar</span>
+                        </a>
+                        <div class="mega-menu-container menu-content">
+                            <div class="container-fluid">
+                                <div class="row">
                                     <div class="col mega-box">
                                         <div class="link-section">
                                             <div class="submenu-title">
-                                                <h5>İstatistik & Raporlar</h5>
+                                                <h5>Raporlar</h5>
                                             </div>
                                             <ul class="submenu-content opensubmegamenu">
                                                 <li><a href="{{ route('statistics.index') }}">Kategori İstatistikleri</a></li>
@@ -285,37 +259,37 @@
                         </div>
                     </li>
 
-                    @haspermission('Dokumanlar')
-                        <li class="mega-menu sidebar-list">
-                            <i class="fa fa-thumb-tack"></i>
-                            <a class="sidebar-link sidebar-title" href="#">
-                                <svg class="stroke-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-file') }}"></use>
-                                </svg>
-                                <svg class="fill-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#fill-file') }}"></use>
-                                </svg>
-                                <span>Doküman İşlemleri</span>
-                            </a>
-                            <div class="mega-menu-container menu-content">
-                                <div class="container-fluid">
-                                    <div class="row">
-                                        <div class="col mega-box">
-                                            <div class="link-section">
-                                                <div class="submenu-title">
-                                                    <h5>Doküman İşlemleri</h5>
-                                                </div>
-                                                <ul class="submenu-content opensubmegamenu">
-                                                    <li><a href="{{ route('dokuman.index') }}">Doküman Yükleme</a></li>
-                                                    <li><a href="{{ route('dokuman.list') }}">Dokümanlar</a></li>
-                                                </ul>
+                    {{-- Kullanıcı Yönetimi --}}
+                    <li class="mega-menu sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title" href="#">
+                            <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use>
+                            </svg>
+                            <span>Kullanıcı Yönetimi</span>
+                        </a>
+                        <div class="mega-menu-container menu-content">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col mega-box">
+                                        <div class="link-section">
+                                            <div class="submenu-title">
+                                                <h5>Bilgisayar Kullanıcıları</h5>
                                             </div>
+                                            <ul class="submenu-content opensubmegamenu">
+                                                <li><a href="{{ route('computer-users.index') }}">Bilgisayar Kullanıcıları</a></li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                    @endhaspermission
+                        </div>
+                    </li>
+
+
 
                     {{-- Boş üçlü sidebar item - silinmemeli --}}
                     <li class=""><a class="sidebar-link" href="#"><svg class="stroke-icon"></svg><svg

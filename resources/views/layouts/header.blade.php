@@ -5,7 +5,7 @@
                 <div class="Typeahead Typeahead--twitterUsers">
                     <div class="u-posRelative">
                         <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
-                            placeholder="Search Cuba .." name="q" title="" autofocus>
+                            placeholder="Ara..." name="q" title="" autofocus>
                         <div class="spinner-border Typeahead-spinner" role="status"><span
                                 class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i>
                     </div>
@@ -22,11 +22,10 @@
         <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
             <div class="notification-slider">
                 <div class="d-flex h-100"> <img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400"><span class="font-primary">Perfas </span><span class="f-light">Bilgi ve
-                            İletişim Güvenliği Rehberi</span></h6><i class="icon-arrow-top-right f-light"></i>
+                    <h6 class="mb-0 f-w-400"><span class="font-primary">Perfas </span><span class="f-light">Performans Analiz Sistemi</span></h6><i class="icon-arrow-top-right f-light"></i>
                 </div>
                 <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400">Bilgi ve İletişim Güvenliği Rehberi</span></h6>
+                    <h6 class="mb-0 f-w-400">Performans Analiz Sistemi</h6>
                 </div>
             </div>
         </div>

@@ -10,11 +10,14 @@
 @section('content')
 <div class="container-fluid p-0">
    <div class="row m-0">
-      <div class="col-xl-5"><img class="bg-img-cover bg-center" src="{{asset('assets/images/login/3.jpg')}}" alt="looginpage"></div>
-      <div class="col-xl-7 p-0">
+      <div class="col-12 p-0">
          <div class="login-card">
             <div>
-               <div><a class="logo" href="{{ route('/') }}"><img class="img-fluid for-light" src="{{asset('assets/images/logo/login.png')}}" alt="looginpage"><img class="img-fluid for-dark" src="{{asset('assets/images/logo/logo_dark.png')}}" alt="looginpage"></a></div>
+               <div class="text-center mb-4">
+                  <a class="logo" href="{{ route('/') }}">
+                     <img class="img-fluid" src="{{asset('assets/images/logo/logo.png')}}" alt="Perfas" style="max-height: 80px;">
+                  </a>
+               </div>
                <div class="login-main">
                   <form action="{{route('register')}}" method="POST" class="theme-form">
                      @csrf
@@ -40,7 +43,7 @@
                      </div>
                      <div class="form-group">
                         <label class="col-form-label">E-Mail</label>
-                        <input class="form-control @error('email') is-invalid @enderror" type="email"   name="email" value="{{old('email')}}" placeholder="Test@gmail.com">
+                        <input class="form-control @error('email') is-invalid @enderror" type="email"   name="email" value="{{old('email')}}" placeholder="ornek@email.com">
                               @error('email')
                               <div class="invalid-feedback">{{$message}}</div>
                               @enderror
@@ -64,15 +67,11 @@
                      <div class="form-group mb-0">
                         <div class="checkbox p-0">
                            <input id="checkbox1" type="checkbox">
-                           <label class="text-muted" for="checkbox1">Agree with<a class="ms-2" href="#">Privacy Policy</a></label>
+                           <label class="text-muted" for="checkbox1">Kullanım şartlarını kabul ediyorum</label>
                         </div>
-                        <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+                        <button class="btn btn-primary btn-block" type="submit">Hesap Oluştur</button>
                      </div>
-                     <h6 class="text-muted mt-4 or">Or signup with</h6>
-                     <div class="social mt-4">
-                        <div class="btn-showcase"><a class="btn btn-light" href="https://www.linkedin.com/login" target="_blank"><i class="txt-linkedin" data-feather="linkedin"></i> LinkedIn </a><a class="btn btn-light" href="https://twitter.com/login?lang=en" target="_blank"><i class="txt-twitter" data-feather="twitter"></i>twitter</a><a class="btn btn-light" href="https://www.facebook.com/" target="_blank"><i class="txt-fb" data-feather="facebook"></i>facebook</a></div>
-                     </div>
-                     <p class="mt-4 mb-0">Zaten bir hesabım var?<a class="ms-2" href="{{ route('login') }}">Sign in</a></p>
+                     <p class="mt-4 mb-0">Zaten bir hesabım var?<a class="ms-2" href="{{ route('login') }}">Giriş Yap</a></p>
                   </form>
                </div>
             </div>

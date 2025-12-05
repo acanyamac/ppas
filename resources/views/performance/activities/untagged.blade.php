@@ -38,10 +38,10 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @if($activities->total() > 0)
+                    @if($totalCount > 0)
                         <div class="alert alert-warning">
                             <i class="fa fa-exclamation-triangle"></i> 
-                            <strong>{{ number_format($activities->total()) }}</strong> aktivite henüz taglenmemiş. 
+                            <strong>{{ number_format($totalCount) }}</strong> aktivite henüz taglenmemiş. 
                             <a href="{{ route('activities.auto-tag') }}" class="alert-link">Otomatik tagleme başlatın</a>
                         </div>
                     @else
@@ -54,6 +54,7 @@
                         <table class="table table-hover" id="untaggedActivitiesTable">
                             <thead>
                                 <tr>
+                                    <th>Kullanıcı</th>
                                     <th>Process Name</th>
                                     <th>Başlık</th>
                                     <th>URL</th>
@@ -64,6 +65,9 @@
                             <tbody>
                                 @foreach($activities as $activity)
                                 <tr>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ $activity->username }}</span>
+                                    </td>
                                     <td><code>{{ Str::limit($activity->process_name, 30) }}</code></td>
                                     <td>{{ Str::limit($activity->title, 50) }}</td>
                                     <td>
@@ -95,7 +99,7 @@
     $(document).ready(function() {
         $('#untaggedActivitiesTable').DataTable({
             "pageLength": 50,
-            "order": [[4, 'desc']], // Başlangıç zamanına göre sırala
+            "order": [[5, 'desc']], // Başlangıç zamanına göre sırala
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
             }

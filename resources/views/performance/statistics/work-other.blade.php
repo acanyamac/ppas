@@ -97,7 +97,9 @@
                     <h5>İş / Diğer Oranı (Süre Bazlı)</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="workOtherPieChart" height="150"></canvas>
+                    <div style="height: 300px;">
+                        <canvas id="workOtherPieChart"></canvas>
+                    </div>
                     <div class="mt-4">
                         <div class="d-flex justify-content-between mb-2">
                             <span>
@@ -123,7 +125,9 @@
                     <h5>Aktivite Sayısı Karşılaştırması</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="activityCountChart" height="150"></canvas>
+                    <div style="height: 300px;">
+                        <canvas id="activityCountChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>

@@ -49,8 +49,8 @@
                     <table style="width: 650px; margin: 0 auto; margin-bottom: 30px">
                       <tbody>
                         <tr>
-                          <td><img src="{{ asset('assets/images/other-images/logo-login.png') }}" alt=""></td>
-                          <td style="text-align: right; color:#999"><span>Some Description</span></td>
+                          <td><img src="{{ asset('assets/images/logo/logo.png') }}" alt="Perfas" style="max-height: 50px;"></td>
+                          <td style="text-align: right; color:#999"><span>Perfas</span></td>
                         </tr>
                       </tbody>
                     </table>

@@ -39,6 +39,7 @@
                         <table class="table table-hover" id="taggedActivitiesTable">
                             <thead>
                                 <tr>
+                                    <th>Kullanıcı</th>
                                     <th>Process Name</th>
                                     <th>Başlık</th>
                                     <th>Kategoriler</th>
@@ -51,6 +52,9 @@
                             <tbody>
                                 @foreach($activities as $activity)
                                 <tr>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ $activity->username }}</span>
+                                    </td>
                                     <td><code>{{ Str::limit($activity->process_name, 25) }}</code></td>
                                     <td>{{ Str::limit($activity->title, 40) }}</td>
                                     <td>
@@ -105,12 +109,12 @@
     $(document).ready(function() {
         $('#taggedActivitiesTable').DataTable({
             "pageLength": 50,
-            "order": [[6, 'desc']], // Başlangıç zamanına göre sırala
+            "order": [[7, 'desc']], // Başlangıç zamanına göre sırala
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
             },
             "columnDefs": [
-                { "orderable": false, "targets": [2, 3, 4] }
+                { "orderable": false, "targets": [3, 4, 5] }
             ]
         });
     });
