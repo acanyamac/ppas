@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\ComputerUser;
 use App\Models\Activity;
+use App\Models\Unit;
 use App\Services\StatisticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,7 @@ class ComputerUserController extends Controller
             );
         }
 
-        $users = ComputerUser::withCount('activities')->get();
+        $users = ComputerUser::with('unit')->withCount('activities')->get();
 
         return view('performance.computer_users.index', compact('users'));
     }
@@ -50,7 +51,8 @@ class ComputerUserController extends Controller
     public function edit($id)
     {
         $user = ComputerUser::findOrFail($id);
-        return view('performance.computer_users.edit', compact('user'));
+        $units = Unit::orderBy('name')->get();
+        return view('performance.computer_users.edit', compact('user', 'units'));
     }
 
     /**
@@ -60,11 +62,13 @@ class ComputerUserController extends Controller
     {
         $request->validate([
             'name' => 'nullable|string|max:255',
+            'unit_id' => 'nullable|exists:units,id',
         ]);
 
         $user = ComputerUser::findOrFail($id);
         $user->update([
-            'name' => $request->name
+            'name' => $request->name,
+            'unit_id' => $request->unit_id,
         ]);
 
         return redirect()->route('computer-users.index')

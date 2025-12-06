@@ -34,6 +34,11 @@ class CategoryKeyword extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function overrides()
+    {
+        return $this->hasMany(KeywordOverride::class, 'keyword_id');
+    }
+
     // Scope'lar
 
     /**

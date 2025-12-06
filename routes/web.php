@@ -112,6 +112,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('keywords-import', [\App\Http\Controllers\Web\KeywordViewController::class, 'import'])->name('keywords.import');
         Route::post('keywords-import', [\App\Http\Controllers\Web\KeywordViewController::class, 'importPost'])->name('keywords.import.post');
         
+        // Keyword Overrides
+        Route::post('keywords/{id}/overrides', [\App\Http\Controllers\Web\KeywordViewController::class, 'storeOverride'])->name('keywords.overrides.store');
+        Route::delete('keywords/overrides/{id}', [\App\Http\Controllers\Web\KeywordViewController::class, 'destroyOverride'])->name('keywords.overrides.destroy');
+        
         // Activities
         Route::resource('activities', \App\Http\Controllers\Web\ActivityViewController::class);
         Route::get('activities-tagged', [\App\Http\Controllers\Web\ActivityViewController::class, 'tagged'])->name('activities.tagged');

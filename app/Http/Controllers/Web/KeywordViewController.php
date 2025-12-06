@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\KeywordService;
 use App\Models\Category;
 use App\Models\CategoryKeyword;
+use App\Models\KeywordOverride;
+use App\Models\Unit;
+use App\Models\ComputerUser;
 use Illuminate\Http\Request;
 
 class KeywordViewController extends Controller
@@ -19,7 +22,8 @@ class KeywordViewController extends Controller
 
     public function index()
     {
-        $keywords = CategoryKeyword::with('category')->orderBy('priority', 'desc')->get();
+        // Eager load overrides count
+        $keywords = CategoryKeyword::with('category')->withCount('overrides')->orderBy('priority', 'desc')->get();
         $categories = Category::active()->get();
         return view('performance.keywords.index', compact('keywords', 'categories'));
     }
@@ -47,9 +51,14 @@ class KeywordViewController extends Controller
 
     public function edit(string $id)
     {
-        $keyword = CategoryKeyword::findOrFail($id);
+        $keyword = CategoryKeyword::with(['overrides.category', 'overrides.unit', 'overrides.computerUser'])
+            ->findOrFail($id);
+            
         $categories = Category::active()->get();
-        return view('performance.keywords.edit', compact('keyword', 'categories'));
+        $units = Unit::orderBy('name')->get();
+        $computerUsers = ComputerUser::orderBy('name')->get(); // name null olabilir gerçi
+        
+        return view('performance.keywords.edit', compact('keyword', 'categories', 'units', 'computerUsers'));
     }
 
     public function update(Request $request, string $id)
@@ -73,6 +82,42 @@ class KeywordViewController extends Controller
 
         return redirect()->route('keywords.index')
             ->with('success', 'Keyword başarıyla silindi.');
+    }
+    
+    /**
+     * Keyword Override Ekleme
+     */
+    public function storeOverride(Request $request, $keywordId)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'type' => 'required|in:unit,user',
+            'unit_id' => 'required_if:type,unit|nullable|exists:units,id',
+            'computer_user_id' => 'required_if:type,user|nullable|exists:computer_users,id',
+        ]);
+
+        if ($request->type === 'unit') {
+             KeywordOverride::updateOrCreate(
+                ['keyword_id' => $keywordId, 'unit_id' => $request->unit_id],
+                ['category_id' => $request->category_id, 'computer_user_id' => null]
+             );
+        } else {
+            KeywordOverride::updateOrCreate(
+                ['keyword_id' => $keywordId, 'computer_user_id' => $request->computer_user_id],
+                ['category_id' => $request->category_id, 'unit_id' => null]
+             );
+        }
+
+        return back()->with('success', 'İstisna başarıyla kaydedildi.');
+    }
+
+    /**
+     * Keyword Override Silme
+     */
+    public function destroyOverride($id)
+    {
+        KeywordOverride::destroy($id);
+        return back()->with('success', 'İstisna silindi.');
     }
 
     public function test()

@@ -13,6 +13,7 @@ class ComputerUser extends Model
         'username',
         'motherboard_uuid',
         'name',
+        'unit_id',
     ];
 
     /**
@@ -22,5 +23,15 @@ class ComputerUser extends Model
     {
         return $this->hasMany(Activity::class, 'username', 'username')
             ->where('motherboard_uuid', $this->motherboard_uuid);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function overrides()
+    {
+        return $this->hasMany(KeywordOverride::class);
     }
 }

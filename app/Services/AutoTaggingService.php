@@ -105,8 +105,14 @@ class AutoTaggingService
     {
         $matches = [];
         
+        // Bu aktiviteyi yapan ComputerUser'ı bul
+        $computerUser = \App\Models\ComputerUser::where('username', $activity->username)
+                            ->where('motherboard_uuid', $activity->motherboard_uuid)
+                            ->first();
+
         // Tüm aktif keyword'leri priority'ye göre getir
-        $keywords = CategoryKeyword::with('category')
+        // Override'ları da eager load edelim
+        $keywords = CategoryKeyword::with(['category', 'overrides.category'])
             ->active()
             ->byPriority()
             ->get();
@@ -134,10 +140,38 @@ class AutoTaggingService
             }
             
             if ($matched) {
+                // Hedef kategoriyi belirle (Bağlamsal Kontrol)
+                $targetCategoryId = $keyword->category_id;
+                $targetCategoryName = $keyword->category->name;
+                
+                if ($computerUser) {
+                    // 1. Kullanıcı Bazlı Override Kontrolü
+                    $userOverride = $keyword->overrides
+                        ->where('computer_user_id', $computerUser->id)
+                        ->first();
+                        
+                    if ($userOverride) {
+                        $targetCategoryId = $userOverride->category_id;
+                        $targetCategoryName = $userOverride->category->name;
+                    } 
+                    // 2. Birim Bazlı Override Kontrolü (Eğer kullanıcıda yoksa)
+                    elseif ($computerUser->unit_id) {
+                        $unitOverride = $keyword->overrides
+                            ->where('unit_id', $computerUser->unit_id)
+                            ->whereNull('computer_user_id')
+                            ->first();
+                            
+                        if ($unitOverride) {
+                            $targetCategoryId = $unitOverride->category_id;
+                            $targetCategoryName = $unitOverride->category->name;
+                        }
+                    }
+                }
+
                 // Bu kategoriye daha önce eşleşme eklenmemiş mi kontrol et
                 $categoryAlreadyMatched = false;
                 foreach ($matches as $existingMatch) {
-                    if ($existingMatch['category_id'] === $keyword->category_id) {
+                    if ($existingMatch['category_id'] === $targetCategoryId) {
                         $categoryAlreadyMatched = true;
                         break;
                     }
@@ -146,8 +180,8 @@ class AutoTaggingService
                 // Eğer bu kategori için daha yüksek priority'li eşleşme yoksa ekle
                 if (!$categoryAlreadyMatched) {
                     $matches[] = [
-                        'category_id' => $keyword->category_id,
-                        'category_name' => $keyword->category->name,
+                        'category_id' => $targetCategoryId,
+                        'category_name' => $targetCategoryName,
                         'keyword' => $keyword->keyword,
                         'match_type' => $keyword->match_type,
                         'matched_field' => $matchedField,

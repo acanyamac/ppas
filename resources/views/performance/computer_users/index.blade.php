@@ -30,6 +30,7 @@
                                 <tr>
                                     <th>Kullanıcı Adı (Sistem)</th>
                                     <th>Görünen İsim</th>
+                                    <th>Birim</th>
                                     <th>Anakart ID</th>
                                     <th>Aktivite Sayısı</th>
                                     <th>Son Güncelleme</th>
@@ -47,6 +48,13 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
+                                    <td>
+                                        @if($user->unit)
+                                            <span class="badge bg-secondary">{{ $user->unit->name }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td><small>{{ Str::limit($user->motherboard_uuid, 20) }}</small></td>
                                     <td>{{ number_format($user->activities_count) }}</td>
                                     <td>{{ $user->updated_at->format('d.m.Y H:i') }}</td>
@@ -54,43 +62,9 @@
                                         <a href="{{ route('computer-users.show', $user->id) }}" class="btn btn-xs btn-info" title="İstatistikler">
                                             <i class="fa fa-bar-chart"></i>
                                         </a>
-                                        <button type="button" class="btn btn-xs btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" title="Düzenle">
+                                        <a href="{{ route('computer-users.edit', $user->id) }}" class="btn btn-xs btn-primary" title="Düzenle">
                                             <i class="fa fa-edit"></i>
-                                        </button>
-
-                                        <!-- Edit Modal -->
-                                        <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Kullanıcı Düzenle</h5>
-                                                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <form action="{{ route('computer-users.update', $user->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Sistem Kullanıcı Adı</label>
-                                                                <input class="form-control" type="text" value="{{ $user->username }}" disabled>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Anakart ID</label>
-                                                                <input class="form-control" type="text" value="{{ $user->motherboard_uuid }}" disabled>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Görünen İsim (Alias)</label>
-                                                                <input class="form-control" type="text" name="name" value="{{ $user->name }}" placeholder="Örn: Ahmet Yılmaz">
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">İptal</button>
-                                                            <button class="btn btn-primary" type="submit">Kaydet</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </td>
                                 </tr>
                                 @endforeach

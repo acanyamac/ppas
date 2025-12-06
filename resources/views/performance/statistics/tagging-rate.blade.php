@@ -90,7 +90,9 @@
                     <h5>Tagleme Başarı Oranı</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="taggingRatePieChart" height="150"></canvas>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="taggingRatePieChart"></canvas>
+                    </div>
                     <div class="text-center mt-3">
                         <h2 class="
                             @if($taggingRate['tagging_rate'] >= 80) text-success
@@ -114,7 +116,9 @@
                     <h5>Otomatik / Manuel Tagleme</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="autoManualChart" height="150"></canvas>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="autoManualChart"></canvas>
+                    </div>
                     <div class="mt-4">
                         <div class="d-flex justify-content-between mb-2">
                             <span>
