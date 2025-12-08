@@ -32,7 +32,7 @@
                                     <th>Görünen İsim</th>
                                     <th>Birim</th>
                                     <th>Anakart ID</th>
-                                    <th>Aktivite Sayısı</th>
+                                    <th>Toplam Süre (Saat)</th>
                                     <th>Son Güncelleme</th>
                                     <th>İşlemler</th>
                                 </tr>
@@ -56,7 +56,7 @@
                                         @endif
                                     </td>
                                     <td><small>{{ Str::limit($user->motherboard_uuid, 20) }}</small></td>
-                                    <td>{{ number_format($user->activities_count) }}</td>
+                                    <td>{{ number_format(($user->activities_sum_duration_ms ?? 0) / (1000 * 60 * 60), 2) }}</td>
                                     <td>{{ $user->updated_at->format('d.m.Y H:i') }}</td>
                                     <td>
                                         <a href="{{ route('computer-users.show', $user->id) }}" class="btn btn-xs btn-info" title="İstatistikler">

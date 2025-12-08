@@ -3,7 +3,7 @@
 @section('title', 'Zaman Dağılımı')
 
 @section('breadcrumb-title')
-    <h3>Zaman Bazlı Dağılım</h3>
+    <h3>Zaman Bazlı Dağılım (Süre)</h3>
 @endsection
 
 @section('breadcrumb-items')
@@ -79,7 +79,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h5>Aktivite Trendi ({{ ucfirst($groupBy) }} Bazlı)</h5>
+                    <h5>Toplam Süre Trendi ({{ ucfirst($groupBy) }} Bazlı - Saat)</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="timeDistributionChart" height="80"></canvas>
@@ -101,11 +101,11 @@
             </div>
         </div>
 
-        <!-- Aktivite Sayısı Dağılımı -->
+        <!-- İş/Diğer Süre Dağılımı -->
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h5>Aktivite Sayısı Dağılımı</h5>
+                    <h5>İş / Diğer Süre Dağılımı</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="countChart" height="150"></canvas>
@@ -130,8 +130,8 @@
                                     <th>Aktivite Sayısı</th>
                                     <th>Toplam Süre</th>
                                     <th>Ortalama Süre</th>
-                                    <th>İş Aktivitesi</th>
-                                    <th>Diğer Aktivite</th>
+                                    <th>İş Süresi (Saat)</th>
+                                    <th>Diğer Süre (Saat)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -158,10 +158,10 @@
                                         {{ sprintf('%02d:%02d:%02d', $avgHours, $avgMinutes, $avgSecs) }}
                                     </td>
                                     <td>
-                                        <span class="badge bg-primary">{{ $item['work_count'] }}</span>
+                                        <span class="badge bg-primary">{{ number_format($item['work_count'], 2) }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-secondary">{{ $item['other_count'] }}</span>
+                                        <span class="badge bg-secondary">{{ number_format($item['other_count'], 2) }}</span>
                                     </td>
                                 </tr>
                                 @empty
@@ -183,7 +183,9 @@
                                         @endphp
                                         <strong>{{ sprintf('%02d:%02d:%02d', $totalHours, $totalMinutes, $totalSecs) }}</strong>
                                     </td>
-                                    <td colspan="3"></td>
+                                    <td>-</td>
+                                    <td><strong>{{ number_format(array_sum(array_column($distribution, 'work_count')), 2) }}</strong></td>
+                                    <td><strong>{{ number_format(array_sum(array_column($distribution, 'other_count')), 2) }}</strong></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -248,8 +250,8 @@
         data: {
             labels: distributionData.map(d => d.period),
             datasets: [{
-                label: 'Aktivite Sayısı',
-                data: distributionData.map(d => d.activity_count),
+                label: 'Toplam Süre (Saat)',
+                data: distributionData.map(d => d.total_duration_hours),
                 borderColor: '#7366ff',
                 backgroundColor: 'rgba(115, 102, 255, 0.1)',
                 tension: 0.4,
@@ -261,12 +263,23 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.raw + ' Saat';
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
                 }
             }
         }
@@ -280,7 +293,7 @@
             labels: distributionData.map(d => d.period),
             datasets: [{
                 label: 'Toplam Süre (saat)',
-                data: distributionData.map(d => d.total_duration_seconds / 3600),
+                data: distributionData.map(d => d.total_duration_hours), // Updated to use hours directly instead of seconds/3600 in JS
                 backgroundColor: '#51bb25'
             }]
         },
@@ -299,7 +312,7 @@
         }
     });
 
-    // Count Bar Chart
+    // Count Chart - Now Work/Other Duration Chart
     const countCtx = document.getElementById('countChart').getContext('2d');
     new Chart(countCtx, {
         type: 'bar',
@@ -307,12 +320,12 @@
             labels: distributionData.map(d => d.period),
             datasets: [
                 {
-                    label: 'İş',
+                    label: 'İş (Saat)',
                     data: distributionData.map(d => d.work_count),
                     backgroundColor: '#7366ff'
                 },
                 {
-                    label: 'Diğer',
+                    label: 'Diğer (Saat)',
                     data: distributionData.map(d => d.other_count),
                     backgroundColor: '#6c757d'
                 }
@@ -323,7 +336,11 @@
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
                 },
                 x: {
                     stacked: false

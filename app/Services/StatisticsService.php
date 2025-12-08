@@ -37,7 +37,10 @@ class StatisticsService
                 DB::raw('AVG(activity_categories.confidence_score) as avg_confidence')
             )
             ->groupBy('categories.id', 'categories.name', 'categories.type')
-            ->orderBy('activity_count', 'desc');
+            ->orderBy('total_duration_ms', 'desc');
+
+        // Apply filters to the query
+        $statsQuery = $this->applyFilters($statsQuery, $filters);
 
         if ($limit) {
             $statsQuery->limit($limit);
@@ -55,12 +58,14 @@ class StatisticsService
         // Basitlik için şimdilik sadece collection sum kullanacağız eğer limit yoksa.
         // Limit varsa, toplam sayıyı bilmemiz lazım.
         
+        // Limit varsa, toplam sayıyı bilmemiz lazım.
+        
         // Performans için: Eğer limit varsa, sadece o kategorilerin yüzdesini hesaplayacağız.
         // Genel toplamı almak pahalı olabilir.
-        $totalActivities = $stats->sum('activity_count');
+        $totalDurationMs = $stats->sum('total_duration_ms');
         
         return [
-            'categories' => $stats->map(function($stat) use ($totalActivities) {
+            'categories' => $stats->map(function($stat) use ($totalDurationMs) {
                 $durationSeconds = $stat->total_duration_ms ? $stat->total_duration_ms / 1000 : 0;
                 $avgDurationSeconds = $stat->activity_count > 0 ? $durationSeconds / $stat->activity_count : 0;
                 
@@ -74,10 +79,10 @@ class StatisticsService
                     'total_duration_hours' => round($durationSeconds / 3600, 2),
                     'avg_duration_seconds' => round($avgDurationSeconds, 0),
                     'avg_confidence' => round($stat->avg_confidence ?? 0, 2),
-                    'percentage' => $totalActivities > 0 ? round(($stat->activity_count / $totalActivities) * 100, 2) : 0,
+                    'percentage' => $totalDurationMs > 0 ? round(($stat->total_duration_ms / $totalDurationMs) * 100, 2) : 0,
                 ];
             }),
-            'total_activities' => $totalActivities,
+            'total_activities' => $stats->sum('activity_count'),
             'total_duration_hours' => round($stats->sum('total_duration_ms') / (1000 * 60 * 60), 2),
         ];
     }
@@ -134,37 +139,48 @@ class StatisticsService
     {
         $query = $this->applyFilters(Activity::query(), $filters);
         
-        $totalActivities = (clone $query)->count();
-        $taggedActivities = (clone $query)->tagged()->count();
-        $untaggedActivities = (clone $query)->untagged()->count();
+        // Tüm hesaplamaları süre (duraiton_ms) üzerinden yap
+        $totalDuration = (clone $query)->sum('duration_ms');
+        $taggedDuration = (clone $query)->tagged()->sum('duration_ms');
+        $untaggedDuration = (count($filters) > 0) ? (clone $query)->untagged()->sum('duration_ms') : ($totalDuration - $taggedDuration);
         
-        // Otomatik ve manuel ayrımı
-        $autoTagged = DB::table('activity_categories')
-            ->where('is_manual', false)
-            ->distinct('activity_id')
-            ->count('activity_id');
+        // Eğer filtre varsa untagged doğrudan sorgulanmalı, yoksa total - tagged daha hızlı olabilir
+        // Ancak tutarlılık için sorgulamak daha güvenli.
+        
+        // Otomatik ve manuel ayrımı (Süre bazlı)
+        $autoTaggedDuration = (clone $query)
+            ->whereHas('categories', function($q) {
+                $q->where('activity_categories.is_manual', false);
+            })
+            ->sum('duration_ms');
             
-        $manualTagged = DB::table('activity_categories')
-            ->where('is_manual', true)
-            ->distinct('activity_id')
-            ->count('activity_id');
+        $manualTaggedDuration = (clone $query)
+            ->whereHas('categories', function($q) {
+                $q->where('activity_categories.is_manual', true);
+            })
+            ->sum('duration_ms');
         
-        $taggingRate = $totalActivities > 0 
-            ? round(($taggedActivities / $totalActivities) * 100, 2) 
+        // Ms -> Saat çevrimi için katsayı
+        $divisor = 1000 * 60 * 60;
+
+        $taggingRate = $totalDuration > 0 
+            ? round(($taggedDuration / $totalDuration) * 100, 2) 
             : 0;
             
-        $autoPercentage = $totalActivities > 0 ? round(($autoTagged / $totalActivities) * 100, 2) : 0;
-        $manualPercentage = $totalActivities > 0 ? round(($manualTagged / $totalActivities) * 100, 2) : 0;
+        $autoPercentage = $totalDuration > 0 ? round(($autoTaggedDuration / $totalDuration) * 100, 2) : 0;
+        $manualPercentage = $totalDuration > 0 ? round(($manualTaggedDuration / $totalDuration) * 100, 2) : 0;
         
         return [
-            'total' => $totalActivities,
-            'tagged' => $taggedActivities,
-            'untagged' => $untaggedActivities,
-            'auto_tagged' => $autoTagged,
-            'manual_tagged' => $manualTagged,
+            // Değerleri saat cinsinden döndürüyoruz
+            'total' => round($totalDuration / $divisor, 2),
+            'tagged' => round($taggedDuration / $divisor, 2),
+            'untagged' => round($untaggedDuration / $divisor, 2),
+            'auto_tagged' => round($autoTaggedDuration / $divisor, 2),
+            'manual_tagged' => round($manualTaggedDuration / $divisor, 2),
             'tagging_rate' => $taggingRate,
             'auto_percentage' => $autoPercentage,
             'manual_percentage' => $manualPercentage,
+            'unit' => 'Saat'
         ];
     }
 
@@ -199,7 +215,7 @@ class StatisticsService
             ->orderBy('period')
             ->get();
         
-        // Work Count per period (En az bir 'work' kategorisi olanlar)
+        // Work Duration per period
         $workStats = DB::table('activities')
             ->whereBetween('start_time_utc', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->whereExists(function ($query) {
@@ -211,12 +227,12 @@ class StatisticsService
             })
             ->select(
                 DB::raw("DATE_FORMAT(start_time_utc, '{$dateFormat}') as period"),
-                DB::raw('COUNT(*) as count')
+                DB::raw('SUM(duration_ms) as duration')
             )
             ->groupBy('period')
-            ->pluck('count', 'period');
+            ->pluck('duration', 'period');
 
-        // Other Count per period (Work olmayan ama Other olanlar)
+        // Other Duration per period
         $otherStats = DB::table('activities')
             ->whereBetween('start_time_utc', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->whereNotExists(function ($query) {
@@ -235,22 +251,36 @@ class StatisticsService
             })
             ->select(
                 DB::raw("DATE_FORMAT(start_time_utc, '{$dateFormat}') as period"),
-                DB::raw('COUNT(*) as count')
+                DB::raw('SUM(duration_ms) as duration')
             )
             ->groupBy('period')
-            ->pluck('count', 'period');
+            ->pluck('duration', 'period');
         
         return $stats->map(function($stat) use ($workStats, $otherStats) {
             $durationSeconds = $stat->total_duration_ms ? $stat->total_duration_ms / 1000 : 0;
             $avgDurationSeconds = $stat->avg_duration_ms ? $stat->avg_duration_ms / 1000 : 0;
             
+            // Work/Other duration in hours for display? Or seconds?
+            // Usually charts want consistent units. Let's provide seconds to be safe or hours.
+            // Let's provide hours as that's likely the requested unit for "duration based", or just seconds and format in frontend.
+            // Re-reading: "tüm grafikler... süre bazlı"
+            // Since I changed TaggingRate to hours, consistency is good.
+            // But TimeDistribution view might be expecting specific values.
+            // Let's check what it uses: it expects 'work_count' and 'other_count' keys originally.
+            // I will return hours in those keys to switch the data source of the chart.
+            
+            $workDuration = $workStats[$stat->period] ?? 0;
+            $otherDuration = $otherStats[$stat->period] ?? 0;
+            
             return [
                 'period' => $stat->period,
                 'activity_count' => $stat->activity_count,
                 'total_duration_seconds' => round($durationSeconds, 0),
+                'total_duration_hours' => round($durationSeconds / 3600, 2),
                 'avg_duration_seconds' => round($avgDurationSeconds, 0),
-                'work_count' => $workStats[$stat->period] ?? 0,
-                'other_count' => $otherStats[$stat->period] ?? 0,
+                'work_count' => round($workDuration / (1000 * 60 * 60), 2), // Now represents Hours
+                'other_count' => round($otherDuration / (1000 * 60 * 60), 2), // Now represents Hours
+                'unit' => 'Saat'
             ];
         })->toArray();
     }

@@ -122,7 +122,7 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h5>Aktivite Sayısı Karşılaştırması</h5>
+                    <h5>Süre Karşılaştırması (Saat)</h5>
                 </div>
                 <div class="card-body">
                     <div style="height: 300px;">
@@ -242,17 +242,17 @@
         }
     });
 
-    // Activity Count Bar Chart
+    // Duration Bar Chart
     const barCtx = document.getElementById('activityCountChart').getContext('2d');
     new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: ['İş', 'Diğer'],
             datasets: [{
-                label: 'Aktivite Sayısı',
+                label: 'Süre (Saat)',
                 data: [
-                    {{ $workOtherRatio['work']['activity_count'] }},
-                    {{ $workOtherRatio['other']['activity_count'] }}
+                    {{ $workOtherRatio['work']['duration_hours'] }},
+                    {{ $workOtherRatio['other']['duration_hours'] }}
                 ],
                 backgroundColor: ['#7366ff', '#6c757d']
             }]
@@ -262,7 +262,20 @@
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toFixed(2) + ' Saat';
+                        }
+                    }
                 }
             }
         }

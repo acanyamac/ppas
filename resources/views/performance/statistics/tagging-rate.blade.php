@@ -3,7 +3,7 @@
 @section('title', 'Tagleme Başarı Oranı')
 
 @section('breadcrumb-title')
-    <h3>Tagleme Başarı Oranı</h3>
+    <h3>Tagleme Başarı Oranı (Süre Bazlı)</h3>
 @endsection
 
 @section('breadcrumb-items')
@@ -49,16 +49,16 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h2 class="text-primary">{{ number_format($taggingRate['total']) }}</h2>
-                    <p class="mb-0">Toplam Aktivite</p>
+                    <h2 class="text-primary">{{ number_format($taggingRate['total'], 2) }}</h2>
+                    <p class="mb-0">Toplam Süre (Saat)</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h2 class="text-success">{{ number_format($taggingRate['tagged']) }}</h2>
-                    <p class="mb-0">Taglenmiş</p>
+                    <h2 class="text-success">{{ number_format($taggingRate['tagged'], 2) }}</h2>
+                    <p class="mb-0">Taglenmiş (Saat)</p>
                     <small class="text-muted">%{{ number_format($taggingRate['tagging_rate'], 1) }}</small>
                 </div>
             </div>
@@ -66,8 +66,8 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h2 class="text-warning">{{ number_format($taggingRate['untagged']) }}</h2>
-                    <p class="mb-0">Taglenmemiş</p>
+                    <h2 class="text-warning">{{ number_format($taggingRate['untagged'], 2) }}</h2>
+                    <p class="mb-0">Taglenmemiş (Saat)</p>
                     <small class="text-muted">%{{ number_format(100 - $taggingRate['tagging_rate'], 1) }}</small>
                 </div>
             </div>
@@ -75,8 +75,8 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h2 class="text-info">{{ number_format($taggingRate['auto_tagged']) }}</h2>
-                    <p class="mb-0">Otomatik Taglenmiş</p>
+                    <h2 class="text-info">{{ number_format($taggingRate['auto_tagged'], 2) }}</h2>
+                    <p class="mb-0">Otomatik (Saat)</p>
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h5>Otomatik / Manuel Tagleme</h5>
+                    <h5>Otomatik / Manuel Tagleme (Saat)</h5>
                 </div>
                 <div class="card-body">
                     <div style="height: 300px; position: relative;">
@@ -124,13 +124,13 @@
                             <span>
                                 <i class="fa fa-circle text-success"></i> Otomatik
                             </span>
-                            <strong>{{ number_format($taggingRate['auto_tagged']) }}</strong>
+                            <strong>{{ number_format($taggingRate['auto_tagged'], 2) }} Saat</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span>
                                 <i class="fa fa-circle text-info"></i> Manuel
                             </span>
-                            <strong>{{ number_format($taggingRate['manual_tagged']) }}</strong>
+                            <strong>{{ number_format($taggingRate['manual_tagged'], 2) }} Saat</strong>
                         </div>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
                             <thead>
                                 <tr>
                                     <th>Durum</th>
-                                    <th>Sayı</th>
+                                    <th>Süre (Saat)</th>
                                     <th>Yüzde</th>
                                     <th>Progress</th>
                                 </tr>
@@ -158,7 +158,7 @@
                             <tbody>
                                 <tr>
                                     <td><strong>Taglenmiş (Toplam)</strong></td>
-                                    <td>{{ number_format($taggingRate['tagged']) }}</td>
+                                    <td>{{ number_format($taggingRate['tagged'], 2) }}</td>
                                     <td>%{{ number_format($taggingRate['tagging_rate'], 1) }}</td>
                                     <td>
                                         <div class="progress" style="height: 25px;">
@@ -171,7 +171,7 @@
                                 </tr>
                                 <tr>
                                     <td>&nbsp;&nbsp;&nbsp;<i class="fa fa-level-up fa-rotate-90"></i> Otomatik</td>
-                                    <td>{{ number_format($taggingRate['auto_tagged']) }}</td>
+                                    <td>{{ number_format($taggingRate['auto_tagged'], 2) }}</td>
                                     <td>%{{ number_format($taggingRate['auto_percentage'], 1) }}</td>
                                     <td>
                                         <div class="progress" style="height: 25px;">
@@ -184,7 +184,7 @@
                                 </tr>
                                 <tr>
                                     <td>&nbsp;&nbsp;&nbsp;<i class="fa fa-level-up fa-rotate-90"></i> Manuel</td>
-                                    <td>{{ number_format($taggingRate['manual_tagged']) }}</td>
+                                    <td>{{ number_format($taggingRate['manual_tagged'], 2) }}</td>
                                     <td>%{{ number_format($taggingRate['manual_percentage'], 1) }}</td>
                                     <td>
                                         <div class="progress" style="height: 25px;">
@@ -197,7 +197,7 @@
                                 </tr>
                                 <tr class="table-warning">
                                     <td><strong>Taglenmemiş</strong></td>
-                                    <td>{{ number_format($taggingRate['untagged']) }}</td>
+                                    <td>{{ number_format($taggingRate['untagged'], 2) }}</td>
                                     <td>%{{ number_format(100 - $taggingRate['tagging_rate'], 1) }}</td>
                                     <td>
                                         <div class="progress" style="height: 25px;">
@@ -215,7 +215,7 @@
                     @if($taggingRate['untagged'] > 0)
                         <div class="alert alert-warning mt-3">
                             <i class="fa fa-exclamation-triangle"></i> 
-                            Henüz <strong>{{ number_format($taggingRate['untagged']) }}</strong> aktivite taglenmemiş. 
+                            Henüz <strong>{{ number_format($taggingRate['untagged'], 2) }} saatlik</strong> aktivite taglenmemiş. 
                             <a href="{{ route('activities.auto-tag') }}" class="alert-link">Otomatik tagleme başlat</a>
                         </div>
                     @endif
@@ -234,7 +234,7 @@
     new Chart(pieCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Taglenmiş', 'Taglenmemiş'],
+            labels: ['Taglenmiş (Saat)', 'Taglenmemiş (Saat)'],
             datasets: [{
                 data: [{{ $taggingRate['tagged'] }}, {{ $taggingRate['untagged'] }}],
                 backgroundColor: ['#51bb25', '#ffc107'],
@@ -247,6 +247,18 @@
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.raw.toFixed(2) + ' Saat';
+                            return label;
+                        }
+                    }
                 }
             }
         }
@@ -259,7 +271,7 @@
         data: {
             labels: ['Otomatik', 'Manuel'],
             datasets: [{
-                label: 'Aktivite Sayısı',
+                label: 'Süre (Saat)',
                 data: [{{ $taggingRate['auto_tagged'] }}, {{ $taggingRate['manual_tagged'] }}],
                 backgroundColor: ['#51bb25', '#17a2b8']
             }]
@@ -269,7 +281,20 @@
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toFixed(2) + ' Saat';
+                        }
+                    }
                 }
             }
         }

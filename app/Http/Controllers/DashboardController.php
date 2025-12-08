@@ -25,21 +25,27 @@ class DashboardController extends Controller
 
     public function index()
     {
-        // İstatistik kartları için veriler
+        // İstatistik kartları için veriler (Süre bazlı - Saat)
         $totalCategories = Category::count();
         $totalKeywords = CategoryKeyword::count();
-        $taggedActivities = Activity::tagged()->count();
-        $untaggedActivities = Activity::untagged()->count();
-        $totalActivities = Activity::count();
-        $taggingRate = $totalActivities > 0 ? round(($taggedActivities / $totalActivities) * 100, 2) : 0;
+        
+        $totalDuration = Activity::sum('duration_ms');
+        $taggedDuration = Activity::tagged()->sum('duration_ms');
+        $untaggedDuration = Activity::untagged()->sum('duration_ms');
+        
+        $taggedActivities = round($taggedDuration / (1000 * 60 * 60), 2); // Saat
+        $untaggedActivities = round($untaggedDuration / (1000 * 60 * 60), 2); // Saat
+        
+        $taggingRate = $totalDuration > 0 ? round(($taggedDuration / $totalDuration) * 100, 2) : 0;
 
-        // Son 7 günlük aktivite trendi
+        // Son 7 günlük toplam süre trendi (Saat)
         $last7Days = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
+            $dailyDuration = Activity::whereDate('start_time_utc', $date)->sum('duration_ms');
             $last7Days[] = [
                 'date' => $date,
-                'count' => Activity::whereDate('start_time_utc', $date)->count(),
+                'count' => round($dailyDuration / (1000 * 60 * 60), 2),
             ];
         }
 

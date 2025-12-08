@@ -40,7 +40,10 @@ class ComputerUserController extends Controller
             );
         }
 
-        $users = ComputerUser::with('unit')->withCount('activities')->get();
+        $users = ComputerUser::with('unit')
+            ->withCount('activities')
+            ->withSum('activities', 'duration_ms')
+            ->get();
 
         return view('performance.computer_users.index', compact('users'));
     }

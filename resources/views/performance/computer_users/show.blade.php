@@ -187,8 +187,8 @@
         data: {
             labels: {!! json_encode($topCategories->pluck('name')->toArray()) !!},
             datasets: [{
-                label: 'Aktivite Sayısı',
-                data: {!! json_encode($topCategories->pluck('activity_count')->toArray()) !!},
+                label: 'Süre (Saat)',
+                data: {!! json_encode($topCategories->pluck('total_duration_hours')->toArray()) !!},
                 backgroundColor: '#7366ff'
             }]
         },
@@ -198,6 +198,22 @@
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toFixed(2) + ' Saat';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
                 }
             }
         }

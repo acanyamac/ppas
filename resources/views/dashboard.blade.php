@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="mb-0">Taglenmiş</h6>
+                            <h6 class="mb-0">Taglenmiş (Saat)</h6>
                             <h3 class="mt-2 mb-0">{{ $taggedActivities }}</h3>
                             <small class="text-muted">%{{ $taggingRate }} başarı oranı</small>
                         </div>
@@ -89,7 +89,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="mb-0">Taglenmemiş</h6>
+                            <h6 class="mb-0">Taglenmemiş (Saat)</h6>
                             <h3 class="mt-2 mb-0">{{ $untaggedActivities }}</h3>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h5>Son 7 Günlük Aktivite Trendi</h5>
+                    <h5>Son 7 Günlük Toplam Süre Trendi (Saat)</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="activityTrendChart" height="100"></canvas>
@@ -217,7 +217,7 @@
         data: {
             labels: {!! json_encode(array_column($last7Days, 'date')) !!},
             datasets: [{
-                label: 'Aktivite Sayısı',
+                label: 'Süre (Saat)',
                 data: {!! json_encode(array_column($last7Days, 'count')) !!},
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -229,6 +229,15 @@
             plugins: {
                 legend: {
                     display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
                 }
             }
         }
@@ -250,7 +259,16 @@
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' Saat';
+                        }
+                    }
+                }
+            }
         }
     });
 
@@ -261,8 +279,8 @@
         data: {
             labels: {!! json_encode($topCategories->pluck('name')->toArray()) !!},
             datasets: [{
-                label: 'Aktivite Sayısı',
-                data: {!! json_encode($topCategories->pluck('activity_count')->toArray()) !!},
+                label: 'Süre (Saat)',
+                data: {!! json_encode($topCategories->pluck('total_duration_hours')->toArray()) !!}, // data changed to duration
                 backgroundColor: '#7366ff'
             }]
         },
@@ -271,6 +289,15 @@
             plugins: {
                 legend: {
                     display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Saat'
+                    }
                 }
             }
         }

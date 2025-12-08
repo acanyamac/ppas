@@ -158,8 +158,8 @@
         data: {
             labels: {!! json_encode($statistics['categories']->pluck('name')) !!},
             datasets: [{
-                label: 'Aktivite Sayısı',
-                data: {!! json_encode($statistics['categories']->pluck('activity_count')) !!},
+                label: 'Toplam Süre (Saat)',
+                data: {!! json_encode($statistics['categories']->pluck('total_duration_hours')) !!},
                 backgroundColor: '#7366ff',
                 borderColor: '#7366ff',
                 borderWidth: 1
@@ -170,6 +170,13 @@
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toFixed(2) + ' Saat';
+                        }
+                    }
                 }
             },
             scales: {
@@ -188,7 +195,7 @@
         data: {
             labels: topCatData.map(c => c.name),
             datasets: [{
-                data: topCatData.map(c => c.activity_count),
+                data: topCatData.map(c => c.total_duration_hours),
                 backgroundColor: [
                     '#7366ff', '#f73164', '#51bb25', '#ffc107', '#17a2b8'
                 ]
@@ -200,6 +207,18 @@
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.raw.toFixed(2) + ' Saat';
+                            return label;
+                        }
+                    }
                 }
             }
         }
