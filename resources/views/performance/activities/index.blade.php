@@ -1,101 +1,267 @@
 @extends('layouts.master')
 
-@section('title', 'Aktiviteler')
+@section('title', 'Aktivite Yönetimi')
 
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
 @endsection
 
 @section('breadcrumb-title')
-    <h3>Tüm Aktiviteler</h3>
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Aktivite Yönetimi</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tüm kullanıcı aktivitelerini görüntüleyin ve yönetin</p>
+    </div>
 @endsection
 
 @section('breadcrumb-items')
-    <li class="breadcrumb-item">Performance Agent</li>
-    <li class="breadcrumb-item active">Aktiviteler</li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+        <span class="text-gray-600 dark:text-gray-400">Performance</span>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+        <span class="text-gray-600 dark:text-gray-400">Aktiviteler</span>
+    </li>
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5>Aktivite Listesi</h5>
-                        <div>
-                            <a href="{{ route('activities.untagged') }}" class="btn btn-warning">
-                                <i class="fa fa-exclamation-circle"></i> Taglenmemiş
-                            </a>
-                            <a href="{{ route('activities.tagged') }}" class="btn btn-success">
-                                <i class="fa fa-check-circle"></i> Taglenmiş
-                            </a>
-                            <a href="{{ route('activities.auto-tag') }}" class="btn btn-primary">
-                                <i class="fa fa-magic"></i> Otomatik Tagleme
-                            </a>
-                        </div>
-                    </div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Toplam</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($activities->total()) }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">aktivite</p>
                 </div>
-                <div class="card-body">
-                    <!-- Filtreler -->
-                    <form method="GET" class="mb-3">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <select name="category_id" class="form-select" onchange="this.form.submit()">
-                                    <option value="">Tüm Kategoriler</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" 
-                                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-list text-blue-600 dark:text-blue-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Taglenmiş</p>
+                    <h3 class="text-2xl font-bold text-green-600 dark:text-green-400">{{ number_format($taggedCount) }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">kategorize edilmiş</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Taglenmemiş</p>
+                    <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400">{{ number_format($untaggedCount) }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">bekliyor</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle text-orange-600 dark:text-orange-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Filtreli Gösterim</p>
+                    <h3 class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ $activities->count() }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">mevcut sayfa</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-filter text-primary-600 dark:text-primary-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Card -->
+<div class="card">
+    <div class="card-header border-b border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h5 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-tasks text-primary-500"></i>
+                    Aktivite Listesi
+                </h5>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tüm kullanıcı aktivitelerini görüntüleyin</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('activities.untagged') }}" class="btn btn-sm bg-orange-500 text-white hover:bg-orange-600">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Taglenmemiş
+                </a>
+                <a href="{{ route('activities.tagged') }}" class="btn btn-sm btn-success">
+                    <i class="fas fa-check-circle mr-1"></i> Taglenmiş
+                </a>
+                <a href="{{ route('activities.auto-tag') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-magic mr-1"></i> Otomatik Tagleme
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Filters -->
+        <form method="GET" class="mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-folder mr-1 text-primary-500"></i> Kategori Filtresi
+                    </label>
+                    <select name="category_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tüm Kategoriler</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    @if(request('category_id'))
+                        <a href="{{ route('activities.index') }}" class="btn btn-secondary w-full">
+                            <i class="fas fa-times mr-1"></i> Filtreyi Temizle
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="table" id="activitiesTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-user text-gray-400"></i>
+                                Kullanıcı
                             </div>
-                        </div>
-                    </form>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="basic-1">
-                            <thead>
-                                <tr>
-                                    <th>Kullanıcı</th>
-                                    <th>Process Name</th>
-                                    <th>Başlık</th>
-                                    <th>Kategoriler</th>
-                                    <th>Başlangıç Zamanı</th>
-                                    <th>Süre</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($activities as $activity)
-                                <tr>
-                                    <td>
-                                        <span class="badge bg-light text-dark">{{ $activity->username }}</span>
-                                    </td>
-                                    <td><code>{{ Str::limit($activity->process_name, 30) }}</code></td>
-                                    <td>{{ Str::limit($activity->title, 50) }}</td>
-                                    <td>
-                                        @forelse($activity->categories as $category)
-                                            <span class="badge bg-primary">{{ $category->name }}</span>
-                                        @empty
-                                            <span class="badge bg-secondary">Taglenmemiş</span>
-                                        @endforelse
-                                    </td>
-                                    <td><small>{{ $activity->start_time_utc->format('d.m.Y H:i:s') }}</small></td>
-                                    <td>
-                                        {{ $activity->duration_formatted }}
-                                    </td>
-                                </tr>
+                        </th>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-cog text-gray-400"></i>
+                                Process
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-file-alt text-gray-400"></i>
+                                Başlık
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-tags text-gray-400"></i>
+                                Kategoriler
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-clock text-gray-400"></i>
+                                Başlangıç
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-hourglass-half text-gray-400"></i>
+                                Süre
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($activities as $activity)
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-primary-600 dark:text-primary-400 text-xs"></i>
+                                </div>
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $activity->username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm font-mono rounded border border-gray-200 dark:border-gray-700">
+                                {{ Str::limit($activity->process_name, 30) }}
+                            </code>
+                        </td>
+                        <td>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ Str::limit($activity->title, 50) }}</span>
+                        </td>
+                        <td>
+                            <div class="flex flex-wrap gap-1">
+                                @forelse($activity->categories as $category)
+                                    <span class="badge badge-primary">{{ $category->name }}</span>
                                 @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">Aktivite bulunamadı</td>
-                                </tr>
+                                    <span class="badge badge-secondary">
+                                        <i class="fas fa-ban text-xs mr-1"></i> Taglenmemiş
+                                    </span>
                                 @endforelse
-                            </tbody>
-                        </table>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-900 dark:text-white">{{ $activity->start_time_utc->format('d.m.Y') }}</div>
+                                <div class="text-gray-500 dark:text-gray-400">{{ $activity->start_time_utc->format('H:i:s') }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded font-medium text-sm">
+                                <i class="fas fa-stopwatch text-xs"></i>
+                                {{ $activity->duration_formatted }}
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-12">
+                            <i class="fas fa-inbox text-5xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400">Aktivite bulunamadı</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="card mt-6 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800">
+    <div class="card-body">
+        <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-info text-white"></i>
+            </div>
+            <div>
+                <h6 class="font-bold text-blue-900 dark:text-blue-300 mb-2">Aktivite Takibi Hakkında</h6>
+                <p class="text-sm text-blue-800 dark:text-blue-200 mb-2">
+                    Bu sayfada tüm kullanıcı aktiviteleri listelenir. Aktiviteler otomatik olarak kaydedilir ve keyword'lere göre kategorize edilir.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm text-blue-700 dark:text-blue-300">
+                    <div>
+                        <strong>Taglenmiş:</strong> En az bir kategoriye atanmış aktiviteler
                     </div>
-
-
+                    <div>
+                        <strong>Taglenmemiş:</strong> Henüz kategorize edilmemiş aktiviteler
+                    </div>
+                    <div>
+                        <strong>Otomatik Tagleme:</strong> Keyword'lere göre toplu etiketleme
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,15 +270,18 @@
 @endsection
 
 @section('script')
-    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('#basic-1').DataTable({
-                "pageLength": 50,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
-                }
-            });
+<script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#activitiesTable').DataTable({
+            "pageLength": 50,
+            "order": [[4, 'desc']], // Başlangıç zamanına göre sırala
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+            },
+            "dom": '<"flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4"lf>rtip',
+            "responsive": true
         });
-    </script>
+    });
+</script>
 @endsection

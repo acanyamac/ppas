@@ -102,13 +102,23 @@ class ComputerUserController extends Controller
             ->orderBy('start_time_utc', 'desc')
             ->limit(20)
             ->get();
+            
+        // Yeni İstatistikler
+        $workingHourStats = $this->statisticsService->getWorkingHourStats($filters);
+        $weeklyRhythm = $this->statisticsService->getWeeklyRhythm($filters);
+        $topKeywords = $this->statisticsService->getTopKeywords($filters, 10);
+        $topProcesses = $this->statisticsService->getTopProcesses($filters, 10);
 
         return view('performance.computer_users.show', compact(
             'user', 
             'topCategories', 
             'workOtherRatio', 
             'recentActivities',
-            'filters'
+            'filters',
+            'workingHourStats',
+            'weeklyRhythm',
+            'topKeywords',
+            'topProcesses'
         ));
     }
 }

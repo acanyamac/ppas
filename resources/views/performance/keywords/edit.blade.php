@@ -2,117 +2,207 @@
 
 @section('title', 'Keyword Düzenle')
 
-@section('content')
-<div class="container-fluid">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-6">
-                <h3>Keyword Düzenle</h3>
-            </div>
-            <div class="col-6">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">                                       
-                        <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use></svg></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('keywords.index') }}">Keywordler</a></li>
-                    <li class="breadcrumb-item active">Düzenle</li>
-                </ol>
-            </div>
-        </div>
+@section('breadcrumb-title')
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Keyword Düzenle</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Keyword ayarlarını ve istisnalarını yönetin</p>
     </div>
-</div>
+@endsection
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Keyword Düzenleme Formu -->
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Keyword Bilgileri</h5>
+@section('breadcrumb-items')
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+        <a href="{{ route('keywords.index') }}" class="text-primary-600 hover:text-primary-700">Keywords</a>
+    </li>
+    <li class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+        <span class="text-gray-600 dark:text-gray-400">Düzenle</span>
+    </li>
+@endsection
+
+@section('content')
+<div x-data="{ 
+    formData: { 
+        match_type: '{{ old('match_type', $keyword->match_type) }}', 
+        priority: {{ old('priority', $keyword->priority) }} 
+    },
+    overrideType: 'unit'
+}">
+    
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <!-- Main Edit Form -->
+        <div class="xl:col-span-2 space-y-6">
+            <form action="{{ route('keywords.update', $keyword->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                
+                <div class="card">
+                    <div class="card-header border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h5 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fas fa-edit text-primary-500"></i>
+                                Keyword Bilgileri
+                            </h5>
+                            <span class="badge badge-primary">{{ $keyword->keyword }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body space-y-6">
+                        <!-- Category & Keyword -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Keyword
+                                </label>
+                                <input type="text" 
+                                       name="keyword" 
+                                       class="form-input @error('keyword') border-red-500 @enderror" 
+                                       value="{{ old('keyword', $keyword->keyword) }}" 
+                                       placeholder="Örn: Visual Studio Code">
+                                @error('keyword')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Varsayılan Kategori
+                                </label>
+                                <select name="category_id" class="form-select @error('category_id') border-red-500 @enderror">
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id', $keyword->category_id) == $category->id ? 'selected' : '' }}>
+                                            {{ $category->getFullPath() }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Match Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                Eşleşme Tipi
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="match_type" value="exact" x-model="formData.match_type" class="peer sr-only">
+                                    <div class="p-3 border-2 rounded-lg text-center transition-all peer-checked:border-green-500 peer-checked:bg-green-50 dark:peer-checked:bg-green-900/20 hover:border-green-300">
+                                        <div class="w-8 h-8 mx-auto bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xs mb-2">100</div>
+                                        <p class="text-xs font-medium text-gray-900 dark:text-white">Tam Eşleşme</p>
+                                    </div>
+                                </label>
+
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="match_type" value="contains" x-model="formData.match_type" class="peer sr-only">
+                                    <div class="p-3 border-2 rounded-lg text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 hover:border-blue-300">
+                                        <div class="w-8 h-8 mx-auto bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs mb-2">80</div>
+                                        <p class="text-xs font-medium text-gray-900 dark:text-white">İçeriyor</p>
+                                    </div>
+                                </label>
+
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="match_type" value="starts_with" x-model="formData.match_type" class="peer sr-only">
+                                    <div class="p-3 border-2 rounded-lg text-center transition-all peer-checked:border-yellow-500 peer-checked:bg-yellow-50 dark:peer-checked:bg-yellow-900/20 hover:border-yellow-300">
+                                        <div class="w-8 h-8 mx-auto bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-xs mb-2">70</div>
+                                        <p class="text-xs font-medium text-gray-900 dark:text-white">Başlıyor</p>
+                                    </div>
+                                </label>
+
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="match_type" value="ends_with" x-model="formData.match_type" class="peer sr-only">
+                                    <div class="p-3 border-2 rounded-lg text-center transition-all peer-checked:border-orange-500 peer-checked:bg-orange-50 dark:peer-checked:bg-orange-900/20 hover:border-orange-300">
+                                        <div class="w-8 h-8 mx-auto bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xs mb-2">70</div>
+                                        <p class="text-xs font-medium text-gray-900 dark:text-white">Bitiyor</p>
+                                    </div>
+                                </label>
+
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="match_type" value="regex" x-model="formData.match_type" class="peer sr-only">
+                                    <div class="p-3 border-2 rounded-lg text-center transition-all peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/20 hover:border-red-300">
+                                        <div class="w-8 h-8 mx-auto bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xs mb-2">60</div>
+                                        <p class="text-xs font-medium text-gray-900 dark:text-white">Regex</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Priority & Settings -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Öncelik (1-10)
+                                </label>
+                                <input type="number" 
+                                       name="priority" 
+                                       x-model="formData.priority"
+                                       class="form-input" 
+                                       min="1" 
+                                       max="10">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Yüksek öncelikli keyword'ler önce işlenir
+                                </p>
+                            </div>
+
+                            <div class="pt-6">
+                                <div class="flex items-center gap-6">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" name="is_case_sensitive" class="form-checkbox h-5 w-5 text-primary-600 rounded" value="1" {{ old('is_case_sensitive', $keyword->is_case_sensitive) ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Case Sensitive</span>
+                                    </label>
+
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" name="is_active" class="form-checkbox h-5 w-5 text-primary-600 rounded" value="1" {{ old('is_active', $keyword->is_active) ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Aktif</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update Button -->
+                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <a href="{{ route('keywords.index') }}" class="btn btn-secondary">İptal</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            </form>
+
+            <!-- Contextual Overrides -->
+            <div class="card">
+                <div class="card-header border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h5 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="fas fa-code-branch text-purple-500"></i>
+                                Bağlamsal İstisnalar
+                            </h5>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Birim veya kullanıcı bazlı özel kategori atamaları</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="card-body">
-                    <form action="{{ route('keywords.update', $keyword->id) }}" method="POST" class="theme-form">
+                    <!-- Add Override Form -->
+                    <form action="{{ route('keywords.overrides.store', $keyword->id) }}" method="POST" class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
                         @csrf
-                        @method('PUT')
-                        
-                        <div class="mb-3">
-                            <label class="col-form-label pt-0" for="keyword">Keyword</label>
-                            <input class="form-control @error('keyword') is-invalid @enderror" id="keyword" name="keyword" type="text" value="{{ old('keyword', $keyword->keyword) }}" placeholder="Google Chrome">
-                            @error('keyword')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="col-form-label pt-0" for="category_id">Varsayılan Kategori</label>
-                            <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id">
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id', $keyword->category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="col-form-label pt-0" for="match_type">Eşleşme Tipi</label>
-                            <select class="form-select @error('match_type') is-invalid @enderror" id="match_type" name="match_type">
-                                <option value="contains" {{ old('match_type', $keyword->match_type) == 'contains' ? 'selected' : '' }}>İçerir (Contains)</option>
-                                <option value="exact" {{ old('match_type', $keyword->match_type) == 'exact' ? 'selected' : '' }}>Tam Eşleşme (Exact)</option>
-                                <option value="starts_with" {{ old('match_type', $keyword->match_type) == 'starts_with' ? 'selected' : '' }}>İle Başlar (Starts With)</option>
-                                <option value="ends_with" {{ old('match_type', $keyword->match_type) == 'ends_with' ? 'selected' : '' }}>İle Biter (Ends With)</option>
-                                <option value="regex" {{ old('match_type', $keyword->match_type) == 'regex' ? 'selected' : '' }}>Regex</option>
-                            </select>
-                            <small class="form-text text-muted">Aktivite başlığı veya process adında bu keyword nasıl aranacak?</small>
-                            @error('match_type')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="col-form-label pt-0" for="priority">Öncelik (1-10)</label>
-                            <input class="form-control @error('priority') is-invalid @enderror" id="priority" name="priority" type="number" min="1" max="10" value="{{ old('priority', $keyword->priority) }}">
-                            <small class="form-text text-muted">Çakışma durumunda yüksek öncelikli keyword geçerli olur.</small>
-                            @error('priority')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="card-footer text-end">
-                            <button class="btn btn-primary" type="submit">Güncelle</button>
-                            <a href="{{ route('keywords.index') }}" class="btn btn-light">İptal</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bağlamsal İstisnalar (Overrides) -->
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>Bağlamsal İstisnalar (Contextual Overrides)</h5>
-                    <span class="badge badge-info">Bu keyword için birim veya kullanıcı bazlı özel kurallar</span>
-                </div>
-                <div class="card-body">
-                    <!-- Yeni İstisna Ekleme Formu -->
-                    <div class="bg-light p-3 mb-4 rounded">
-                        <h6>Yeni İstisna Ekle</h6>
-                        <form action="{{ route('keywords.overrides.store', $keyword->id) }}" method="POST" class="row g-3 align-items-end">
-                            @csrf
-                            <div class="col-md-3">
-                                <label class="form-label">Tip</label>
-                                <select class="form-select @error('type') is-invalid @enderror" name="type" id="override_type" onchange="toggleOverrideInputs()">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tip</label>
+                                <select name="type" x-model="overrideType" class="form-select w-full">
                                     <option value="unit">Birim Bazlı</option>
                                     <option value="user">Kullanıcı Bazlı</option>
                                 </select>
                             </div>
 
-                            <div class="col-md-3" id="unit_input_group">
-                                <label class="form-label">Birim Seçiniz</label>
-                                <select class="form-select @error('unit_id') is-invalid @enderror" name="unit_id">
+                            <div x-show="overrideType === 'unit'">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Birim</label>
+                                <select name="unit_id" class="form-select w-full">
                                     <option value="">Seçiniz...</option>
                                     @foreach($units as $unit)
                                         <option value="{{ $unit->id }}">{{ $unit->name }}</option>
@@ -120,66 +210,81 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3 d-none" id="user_input_group">
-                                <label class="form-label">Kullanıcı Seçiniz</label>
-                                <select class="form-select @error('computer_user_id') is-invalid @enderror" name="computer_user_id">
+                            <div x-show="overrideType === 'user'" style="display: none;">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kullanıcı</label>
+                                <select name="computer_user_id" class="form-select w-full">
                                     <option value="">Seçiniz...</option>
                                     @foreach($computerUsers as $cUser)
-                                        <option value="{{ $cUser->id }}">{{ $cUser->name ?? $cUser->username }} ({{ $cUser->username }})</option>
+                                        <option value="{{ $cUser->id }}">{{ $cUser->username }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label">Hedef Kategori</label>
-                                <select class="form-select @error('category_id') is-invalid @enderror" name="category_id">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hedef Kategori</label>
+                                <select name="category_id" class="form-select w-full" required>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-success w-100">İstisna Ekle</button>
+                            <div>
+                                <button type="submit" class="btn btn-success w-full">
+                                    <i class="fas fa-plus mr-1"></i> Ekle
+                                </button>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
 
-                    <!-- Mevcut İstisnalar Tablosu -->
+                    <!-- Overrides List -->
                     @if($keyword->overrides->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                            <table class="table w-full">
+                                <thead class="bg-gray-50 dark:bg-gray-800">
                                     <tr>
-                                        <th>Tip</th>
-                                        <th>Birim / Kullanıcı</th>
-                                        <th>Hedef Kategori</th>
-                                        <th>İşlem</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tip</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Birim / Kullanıcı</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hedef Kategori</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">İşlem</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach($keyword->overrides as $override)
                                         <tr>
-                                            <td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
                                                 @if($override->unit_id)
-                                                    <span class="badge badge-primary">Birim</span>
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                                        <i class="fas fa-building mr-1"></i> Birim
+                                                    </span>
                                                 @else
-                                                    <span class="badge badge-warning">Kullanıcı</span>
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                                        <i class="fas fa-user mr-1"></i> Kullanıcı
+                                                    </span>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                 @if($override->unit_id)
                                                     {{ $override->unit->name ?? 'Silinmiş Birim' }}
                                                 @else
-                                                    {{ $override->computerUser->name ?? $override->computerUser->username ?? 'Silinmiş Kullanıcı' }}
+                                                    <div class="flex flex-col">
+                                                        <span class="font-medium">{{ $override->computerUser->username ?? 'Silinmiş' }}</span>
+                                                        <span class="text-xs text-gray-500">{{ $override->computerUser->name ?? '' }}</span>
+                                                    </div>
                                                 @endif
                                             </td>
-                                            <td>{{ $override->category->name }}</td>
-                                            <td>
-                                                <form action="{{ route('keywords.overrides.destroy', $override->id) }}" method="POST" onsubmit="return confirm('Bu istisnayı silmek istediğinize emin misiniz?');">
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <span class="badge badge-outline-primary">
+                                                    {{ $override->category->name }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                                <form action="{{ route('keywords.overrides.destroy', $override->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Sil</button>
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -188,29 +293,53 @@
                             </table>
                         </div>
                     @else
-                        <div class="alert alert-light text-center" role="alert">
-                            Henüz tanımlanmış bir istisna bulunmuyor.
+                        <div class="text-center py-8 bg-gray-50 dark:bg-gray-800/30 rounded-lg dashed border-2 border-gray-200 dark:border-gray-700">
+                            <i class="fas fa-info-circle text-gray-400 text-3xl mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400">Henüz tanımlanmış bir istisna bulunmuyor.</p>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
+
+        <!-- Sidebar Info -->
+        <div class="xl:col-span-1 space-y-6">
+            <!-- Stats -->
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="font-bold text-gray-900 dark:text-white mb-4">İstatistikler</h6>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Toplam Eşleşme</span>
+                            <span class="font-bold text-primary-600">{{ number_format($keyword->activities_count ?? 0) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Oluşturma</span>
+                            <span class="text-sm font-medium">{{ $keyword->created_at->format('d.m.Y') }}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Son Güncelleme</span>
+                            <span class="text-sm font-medium">{{ $keyword->updated_at->format('d.m.Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help -->
+            <div class="card bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800">
+                <div class="card-body">
+                    <h6 class="font-bold text-blue-900 dark:text-blue-300 mb-2">
+                        <i class="fas fa-question-circle mr-1"></i> İstisna Nedir?
+                    </h6>
+                    <p class="text-sm text-blue-800 dark:text-blue-200 mb-2">
+                        Normalde bu keyword <strong>{{ $keyword->category->name ?? 'Seçili Kategori' }}</strong> kategorisine gider.
+                    </p>
+                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                        Ancak belirli bir <strong>Birim</strong> veya <strong>Kullanıcı</strong> bu keyword'ü ürettiğinde farklı bir kategoriye gitmesini istiyorsanız istisna ekleyebilirsiniz.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-@endsection
-
-@section('script')
-<script>
-    function toggleOverrideInputs() {
-        var type = document.getElementById('override_type').value;
-        if (type === 'unit') {
-            document.getElementById('unit_input_group').classList.remove('d-none');
-            document.getElementById('user_input_group').classList.add('d-none');
-        } else {
-            document.getElementById('unit_input_group').classList.add('d-none');
-            document.getElementById('user_input_group').classList.remove('d-none');
-        }
-    }
-</script>
 @endsection

@@ -1,109 +1,155 @@
-<div class="page-header">
-    <div class="header-wrapper row m-0">
-        <form class="form-inline search-full col" action="#" method="get">
-            <div class="form-group w-100">
-                <div class="Typeahead Typeahead--twitterUsers">
-                    <div class="u-posRelative">
-                        <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
-                            placeholder="Ara..." name="q" title="" autofocus>
-                        <div class="spinner-border Typeahead-spinner" role="status"><span
-                                class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i>
-                    </div>
-                    <div class="Typeahead-menu"></div>
-                </div>
-            </div>
-        </form>
-        <div class="header-logo-wrapper col-auto p-0">
-            <div class="logo-wrapper"><a href="{{ route('/') }}"><img class="img-fluid"
-                        src="{{ asset('assets/images/logo/logo.png') }}" alt=""></a></div>
-            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div class="flex items-center justify-between">
+        
+        <!-- Left Side: Toggle & Search -->
+        <div class="flex items-center gap-4">
+            <!-- Sidebar Toggle (Desktop) -->
+            <button 
+                @click="sidebarOpen = !sidebarOpen" 
+                class="hidden lg:block text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            >
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button 
+                @click="mobileMenuOpen = true" 
+                class="lg:hidden text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            >
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            
+            <!-- Search Bar -->
+            <div class="hidden md:block relative">
+                <input 
+                    type="text" 
+                    placeholder="Ara..." 
+                    class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                >
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
         </div>
-        <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
-            <div class="notification-slider">
-                <div class="d-flex h-100"> <img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400"><span class="font-primary">Perfas </span><span class="f-light">Performans Analiz Sistemi</span></h6><i class="icon-arrow-top-right f-light"></i>
-                </div>
-                <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400">Performans Analiz Sistemi</h6>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
-            <ul class="nav-menus">
-
-                <li>
-                    <div class="mode">
-                        <svg>
-                            <use href="{{ asset('assets/svg/icon-sprite.svg#moon') }}"></use>
-                        </svg>
+        
+        <!-- Right Side: Actions & Profile -->
+        <div class="flex items-center gap-3">
+            
+            <!-- Dark Mode Toggle -->
+            <button 
+                @click="toggleDarkMode()" 
+                class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+                title="Dark Mode"
+            >
+                <i class="fas fa-moon text-lg dark:hidden"></i>
+                <i class="fas fa-sun text-lg hidden dark:inline"></i>
+            </button>
+            
+            <!-- Notifications -->
+            <div x-data="{ open: false }" class="relative">
+                <button 
+                    @click="open = !open" 
+                    class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all relative"
+                    title="Bildirimler"
+                >
+                    <i class="fas fa-bell text-lg"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                
+                <!-- Notifications Dropdown -->
+                <div 
+                    x-show="open" 
+                    @click.away="open = false"
+                    x-transition
+                    class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                    x-cloak
+                >
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Bildirimler</h3>
                     </div>
-                </li>
-
-                <li class="onhover-dropdown" id="notification_li">
-                    <?php $not = new \App\Http\Controllers\NotificationController(); ?> {!! $not->get_notifications() !!}
-                </li>
-                <li class="onhover-dropdown">
-                    <div class="notification-box">
-                        <a href="#" title="">
-                            <svg>
-                                <use href="{{ asset('assets/svg/icon-sprite.svg#notification') }}"></use>
-                            </svg>
-
-                            <span class="badge rounded-pill badge-secondary">5</span>
-
-
-
+                    <div class="max-h-96 overflow-y-auto scrollbar-thin">
+                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900 dark:text-white">Yeni aktivite eklendi</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">2 dakika önce</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-900 dark:text-white">Tagleme işlemi tamamlandı</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 saat önce</p>
+                                </div>
+                            </div>
                         </a>
                     </div>
-
-                </li>
-
-                <li class="profile-nav onhover-dropdown pe-0 py-0">
-                    <div class="media profile-media"><img class="b-r-10"
-                            src="{{ asset('assets/images/logo/logo.png') }}" width="35" height="35"
-                            alt="">
-                        <div class="media-body"><span>{{ auth()->user()->name }} {{ auth()->user()->last_name }}</span>
-                            <p class="mb-0 font-roboto">{{ auth()->user()->roles[0]->name }} <i
-                                    class="middle fa fa-angle-down"></i></p>
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-center">
+                        <a href="#" class="text-sm text-primary-500 hover:text-primary-700 font-medium">Tümünü Gör</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Profile -->
+            <div x-data="{ open: false }" class="relative">
+                <button 
+                    @click="open = !open" 
+                    class="flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+                >
+                    <div class="flex items-center gap-3">
+                        <div class="hidden sm:block text-right">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                {{ Auth::user()->name ?? 'Kullan cı' }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ Auth::user()->email ?? 'user@example.com' }}
+                            </p>
+                        </div>
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold">
+                                {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
+                            </span>
                         </div>
                     </div>
-                    <ul class="profile-dropdown onhover-show-div">
-                        {{-- <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
-            <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-            <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-            <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li> --}}
-                        <li>
-                            @guest
-
-                                <a href="{{ route('login') }}"><i data-feather="log-in"> </i><span>Giriş yap</span></a>
-                            @endguest
-
-
-                            @auth
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <a :href="route('logout')"
-                                        onclick="event.preventDefault(); this.closest('form').submit
-                  ()
-"><i
-                                            data-feather="log-out"> </i>Çıkış yap</a>
-                                </form>
-                            @endauth
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                </button>
+                
+                <!-- Profile Dropdown -->
+                <div 
+                    x-show="open" 
+                    @click.away="open = false"
+                    x-transition
+                    class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                    x-cloak
+                >
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ Auth::user()->name ?? 'Kullanıcı' }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ Auth::user()->email ?? 'user@example.com' }}</p>
+                    </div>
+                    <div class="py-2">
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-user w-4"></i>
+                            <span>Profilim</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            <span>Ayarlar</span>
+                        </a>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 py-2">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full text-left">
+                                <i class="fas fa-sign-out-alt w-4"></i>
+                                <span>Çıkış Yap</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
         </div>
-        <script class="result-template" type="text/x-handlebars-template">
-      <div class="ProfileCard u-cf">                        
-      <div class="ProfileCard-avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-airplay m-0"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg></div>
-      <div class="ProfileCard-details">
-      {{-- <div class="ProfileCard-realName">{{name}}</div> --}}
-      </div>
-      </div>
-    </script>
-        <script class="empty-template" type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script>
     </div>
-</div>
+</header>

@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Custom Scrollbar */
+@layer utilities {
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        @apply bg-gray-100 dark:bg-gray-800;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-400 dark:bg-gray-500;
+    }
+}
+
+/* Custom Components */
+@layer components {
+
+    /* Button Styles */
+    .btn {
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    }
+
+    .btn-primary {
+        @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+    }
+
+    .btn-success {
+        @apply bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-danger {
+        @apply bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-warning {
+        @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-info {
+        @apply bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-sm;
+    }
+
+    .btn-lg {
+        @apply px-6 py-3 text-lg;
+    }
+
+    /* Card Styles */
+    .card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-soft overflow-hidden transition-all duration-300;
+    }
+
+    .card-hover {
+        @apply hover:shadow-xl hover:-translate-y-1;
+    }
+
+    .card-header {
+        @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700;
+    }
+
+    .card-body {
+        @apply px-6 py-4;
+    }
+
+    .card-footer {
+        @apply px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
+    }
+
+    /* Form Styles */
+    .form-control {
+        @apply w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    }
+
+    .form-label {
+        @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+    }
+
+    .form-select {
+        @apply form-control appearance-none bg-no-repeat bg-right;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    /* Badge Styles */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    }
+
+    .badge-primary {
+        @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200;
+    }
+
+    .badge-secondary {
+        @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200;
+    }
+
+    .badge-success {
+        @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+    }
+
+    .badge-danger {
+        @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+    }
+
+    .badge-info {
+        @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+    }
+
+    /* Alert Styles */
+    .alert {
+        @apply p-4 rounded-lg mb-4 border-l-4;
+    }
+
+    .alert-success {
+        @apply bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:text-green-200;
+    }
+
+    .alert-danger {
+        @apply bg-red-50 border-red-500 text-red-800 dark:bg-red-900/20 dark:text-red-200;
+    }
+
+    .alert-warning {
+        @apply bg-yellow-50 border-yellow-500 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200;
+    }
+
+    .alert-info {
+        @apply bg-blue-50 border-blue-500 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200;
+    }
+
+    /* Table Styles */
+    .table {
+        @apply w-full text-left;
+    }
+
+    .table thead {
+        @apply bg-gray-50 dark:bg-gray-900;
+    }
+
+    .table thead th {
+        @apply px-6 py-3 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider;
+    }
+
+    .table tbody tr {
+        @apply border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors;
+    }
+
+    .table tbody td {
+        @apply px-6 py-4 text-sm text-gray-900 dark:text-gray-100;
+    }
+
+    /* Sidebar Styles */
+    .sidebar-link {
+        @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg transition-all duration-200;
+    }
+
+    .sidebar-link.active {
+        @apply bg-primary-500 text-white hover:bg-primary-600 hover:text-white dark:bg-primary-600;
+    }
+}
+
+/* Animations */
+@layer utilities {
+    .animate-fadeIn {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .animate-slideIn {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .animate-scaleIn {
+        animation: scaleIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+}
+
+/* Gradient Text */
+.text-gradient {
+    @apply bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent;
+}
+
+/* Glass Effect */
+.glass-effect {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg;
+}
+
+/* Dark Mode Form Fixes */
+.dark .form-input,
+.dark .form-select,
+.dark .form-textarea {
+    @apply bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500;
+}
+
+.dark .form-input:focus,
+.dark .form-select:focus,
+.dark .form-textarea:focus {
+    @apply bg-gray-800 border-primary-500 ring-primary-500;
+}
+
+/* DataTables Dark Mode Fixes */
+.dark .dataTables_wrapper {
+    @apply text-gray-300;
+}
+
+.dark .dataTables_wrapper .dataTables_length,
+.dark .dataTables_wrapper .dataTables_filter,
+.dark .dataTables_wrapper .dataTables_info,
+.dark .dataTables_wrapper .dataTables_processing,
+.dark .dataTables_wrapper .dataTables_paginate {
+    @apply text-gray-300;
+}
+
+.dark .dataTables_wrapper .dataTables_length select,
+.dark .dataTables_wrapper .dataTables_filter input {
+    @apply bg-gray-800 border-gray-700 text-gray-200;
+}
+
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+    @apply text-gray-300 bg-gray-800 border-gray-700;
+}
+
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    @apply bg-gray-700 text-white border-gray-600;
+}
+
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    @apply bg-primary-600 text-white border-primary-600;
+}
+
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    @apply text-gray-600 bg-gray-900 border-gray-800;
+}
+
+.dark table.dataTable thead th,
+.dark table.dataTable thead td {
+    @apply border-gray-700;
+}
+
+.dark table.dataTable tbody tr {
+    @apply bg-gray-800;
+}
+
+.dark table.dataTable tbody tr:hover {
+    @apply bg-gray-700;
+}
+
+.dark table.dataTable tbody td {
+    @apply border-gray-700;
+}
+
+.dark table.dataTable.stripe tbody tr.odd,
+.dark table.dataTable.display tbody tr.odd {
+    @apply bg-gray-800;
+}
+
+.dark table.dataTable.stripe tbody tr.even,
+.dark table.dataTable.display tbody tr.even {
+    @apply bg-gray-900;
+}
+
+.dark table.dataTable.hover tbody tr:hover,
+.dark table.dataTable.display tbody tr:hover {
+    @apply bg-gray-700;
+}
+
+.dark .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody {
+    @apply border-gray-700;
+}
