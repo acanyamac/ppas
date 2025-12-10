@@ -1,11 +1,13 @@
- <!-- footer start-->
- <footer class="footer">
-     <div class="container-fluid">
-         <div class="row">
-            <div class="col-md-8 footer-copyright text-center">
-                <p class="mb-0">İletişim, soru, öneri ve istekleriniz için <a href="https://www.perfas.com.tr" target="_blank" rel="noopener noreferrer">www.perfas.com.tr</a> </p>
-            </div>
-            <div class="col-md-4 footer-copyright text-center">Powered by Perfas V2.4.5 © 2025</div>
-         </div>
-     </div>
- </footer>
+<!-- Footer -->
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+            <p>© {{ date('Y') }} <span class="font-semibold text-primary-500">Perfas</span> - Performance Agent System</p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+            <a href="#" class="hover:text-primary-500 transition-colors">Yardım</a>
+            <a href="#" class="hover:text-primary-500 transition-colors">Destek</a>
+            <a href="#" class="hover:text-primary-500 transition-colors">Gizlilik</a>
+        </div>
+    </div>
+</footer>

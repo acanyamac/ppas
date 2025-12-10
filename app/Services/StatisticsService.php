@@ -380,4 +380,163 @@ class StatisticsService
         
         return $query;
     }
+    /**
+     * Mesai saatleri analizi (09:00 - 18:00)
+     */
+    public function getWorkingHourStats(array $filters): array
+    {
+        $query = $this->applyFilters(Activity::query(), $filters);
+        
+        // UTC+3 (TR) varsayımı ile saat dilimi ayarı
+        // Mesai: 09:00 - 18:00
+        
+        $stats = (clone $query)->selectRaw("
+            SUM(CASE 
+                WHEN HOUR(ADDTIME(start_time_utc, '03:00:00')) >= 9 AND HOUR(ADDTIME(start_time_utc, '03:00:00')) < 18 
+                THEN duration_ms ELSE 0 END) as total_working_hours_duration,
+            SUM(CASE 
+                WHEN HOUR(ADDTIME(start_time_utc, '03:00:00')) < 9 OR HOUR(ADDTIME(start_time_utc, '03:00:00')) >= 18 
+                THEN duration_ms ELSE 0 END) as total_outside_hours_duration
+        ")->first();
+
+        // Sadece 'Work' aktiviteleri için
+        $workQuery = (clone $query)->whereHas('categories', function($q) {
+            $q->where('type', 'work');
+        });
+
+        $workStats = $workQuery->selectRaw("
+            SUM(CASE 
+                WHEN HOUR(ADDTIME(start_time_utc, '03:00:00')) >= 9 AND HOUR(ADDTIME(start_time_utc, '03:00:00')) < 18 
+                THEN duration_ms ELSE 0 END) as work_working_hours_duration,
+            SUM(CASE 
+                WHEN HOUR(ADDTIME(start_time_utc, '03:00:00')) < 9 OR HOUR(ADDTIME(start_time_utc, '03:00:00')) >= 18 
+                THEN duration_ms ELSE 0 END) as work_outside_hours_duration
+        ")->first();
+
+        $divisor = 1000 * 60 * 60; // Saate çevir
+
+        return [
+            'working_hours' => [
+                'total' => round(($stats->total_working_hours_duration ?? 0) / $divisor, 2),
+                'work' => round(($workStats->work_working_hours_duration ?? 0) / $divisor, 2),
+            ],
+            'outside_hours' => [
+                'total' => round(($stats->total_outside_hours_duration ?? 0) / $divisor, 2),
+                'work' => round(($workStats->work_outside_hours_duration ?? 0) / $divisor, 2),
+            ]
+        ];
+    }
+
+    /**
+     * Haftalık Ritim (Haftanın günlerine göre İş aktivitesi ortalaması)
+     */
+    public function getWeeklyRhythm(array $filters): array
+    {
+        $query = Activity::query();
+        $query = $this->applyFilters($query, $filters);
+
+        // Sadece İş aktiviteleri
+        $query->whereHas('categories', function($q) {
+            $q->where('type', 'work');
+        });
+
+        // DAYOFWEEK: 1=Sunday, 2=Monday, ..., 7=Saturday
+        // Biz Pazartesi (2) -> Pazar (1) sıralaması istiyoruz
+        
+        $results = $query->selectRaw("
+            DAYOFWEEK(ADDTIME(start_time_utc, '03:00:00')) as day_num,
+            SUM(duration_ms) as total_duration,
+            COUNT(DISTINCT DATE(ADDTIME(start_time_utc, '03:00:00'))) as unique_days
+        ")
+        ->groupBy('day_num')
+        ->get();
+
+        $days = [
+            2 => 'Pazartesi',
+            3 => 'Salı',
+            4 => 'Çarşamba',
+            5 => 'Perşembe',
+            6 => 'Cuma',
+            7 => 'Cumartesi',
+            1 => 'Pazar'
+        ];
+
+        $output = [];
+        foreach ($days as $num => $name) {
+            $record = $results->firstWhere('day_num', $num);
+            $totalDurationHours = $record ? ($record->total_duration / (1000 * 60 * 60)) : 0;
+            $uniqueDays = $record ? $record->unique_days : 1; // Sıfıra bölme hatası olmasın
+            
+            // Ortalama: Toplam Süre / O günün kaç kere yaşandığı (Filtre aralığında kaç Pazartesi var?)
+            $avgHours = $uniqueDays > 0 ? $totalDurationHours / $uniqueDays : 0;
+
+            $output[] = [
+                'day' => $name,
+                'avg_hours' => round($avgHours, 2),
+                'total_hours' => round($totalDurationHours, 2)
+            ];
+        }
+
+        return $output;
+    }
+
+    /**
+     * En çok kullanılan Keywordler
+     */
+    public function getTopKeywords(array $filters, int $limit = 5): array
+    {
+        $query = DB::table('activity_categories')
+            ->join('activities', 'activity_categories.activity_id', '=', 'activities.id')
+            ->whereNotNull('activity_categories.matched_keyword')
+            ->where('activity_categories.matched_keyword', '!=', '');
+
+        // Apply filters manually to builder since applyFilters expects Eloquent
+        if (!empty($filters['start_date'])) $query->where('activities.start_time_utc', '>=', $filters['start_date']);
+        if (!empty($filters['end_date'])) $query->where('activities.start_time_utc', '<=', $filters['end_date']);
+        if (!empty($filters['username'])) $query->where('activities.username', $filters['username']);
+        if (!empty($filters['motherboard_uuid'])) $query->where('activities.motherboard_uuid', $filters['motherboard_uuid']);
+
+        return $query->select(
+                'activity_categories.matched_keyword as keyword',
+                DB::raw('COUNT(*) as usage_count'),
+                DB::raw('SUM(activities.duration_ms) as total_duration')
+            )
+            ->groupBy('keyword')
+            ->orderBy('total_duration', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'keyword' => $item->keyword,
+                    'count' => $item->usage_count,
+                    'duration_hours' => round($item->total_duration / (1000 * 60 * 60), 2)
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * En çok kullanılan Uygulamalar (Process Name)
+     */
+    public function getTopProcesses(array $filters, int $limit = 5): array
+    {
+        $query = $this->applyFilters(Activity::query(), $filters);
+        
+        return $query->select(
+                'process_name',
+                DB::raw('SUM(duration_ms) as total_duration')
+            )
+            ->groupBy('process_name')
+            ->orderBy('total_duration', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'process_name' => $item->process_name,
+                    'duration_hours' => round($item->total_duration / (1000 * 60 * 60), 2)
+                ];
+            })
+            ->toArray();
+    }
 }
+

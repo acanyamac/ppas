@@ -19,17 +19,22 @@ class ActivityViewController extends Controller
 
     public function index(Request $request)
     {
-        $query = Activity::with('categories')->orderBy('start_time_utc', 'desc');
+        $query = Activity::with('categories')->withCount('categories')->orderBy('start_time_utc', 'desc');
         
         // Kategori filtresi
         if ($request->has('category_id') && $request->category_id) {
             $query->byCategory($request->category_id);
         }
         
-        $activities = $query->limit(1000)->get();
+        // İstatistikler için
+        $taggedCount = (clone $query)->has('categories')->count();
+        $untaggedCount = (clone $query)->doesntHave('categories')->count();
+        
+        // Pagination kullan
+        $activities = $query->paginate(50)->withQueryString();
         $categories = Category::active()->get();
         
-        return view('performance.activities.index', compact('activities', 'categories'));
+        return view('performance.activities.index', compact('activities', 'categories', 'taggedCount', 'untaggedCount'));
     }
 
     public function tagged()

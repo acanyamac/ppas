@@ -1,85 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<html lang="tr" class="h-full">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Perfas - 4Dimension">
-    <meta name="keywords" content="Perfas DDO, BGYS, KVKK, ISO27001, ISO9001, ISO14001, ISO45001">
-    <meta name="author" content="pixelstrap">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{asset('assets/images/favicon.png')}}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}" type="image/x-icon">
-    <title>Perfas v2</title>
-    <!-- Google font-->
-    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
+    <meta name="description" content="Perfas - Performance Agent System">
     
-    @include('layouts.css')
+    <title>@yield('title', 'Perfas') - Performance Agent</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{asset('assets/images/favicon.png')}}" type="image/x-icon">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Vite CSS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    @yield('css')
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    
     @yield('style')
-  </head>
-  {{-- @dd(Route::current()->getName()); --}}
-  <body @if(Route::current()->getName() == 'button-builder') class="button-builder" @endif>
-    <div class="loader-wrapper">
-      <div class="loader-index"><span></span></div>
-      <svg>
-        <defs></defs>
-        <filter id="goo">
-          <fegaussianblur in="SourceGraphic" stddeviation="11" result="blur"></fegaussianblur>
-          <fecolormatrix in="blur" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo"> </fecolormatrix>
-        </filter>
-      </svg>
-    </div>
-    <!-- tap on top starts-->
-    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-    <!-- tap on tap ends-->
-    <!-- page-wrapper Start-->
-    <div class="page-wrapper compact-wrapper" id="pageWrapper">
-      <!-- Page Header Start-->
-      @include('layouts.header')
-      <!-- Page Header Ends  -->
-      <!-- Page Body Start-->
-      <div class="page-body-wrapper">
-        <!-- Page Sidebar Start-->
-        @include('layouts.sidebar')
-        <!-- Page Sidebar Ends-->
-        <div class="page-body">
-          <div class="container-fluid">        
-            <div class="page-title">
-              <div class="row">
-                <div class="col-6">
-                  @yield('breadcrumb-title')
-                </div>
-                <div class="col-6">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('/')}}">                                       
-                      <svg class="stroke-icon">
-                        <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
-                      </svg></a></li></li>
-                    @yield('breadcrumb-items')
-                  </ol>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Container-fluid starts-->
-          @yield('content')
-          <!-- Container-fluid Ends-->
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans antialiased">
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 800)">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-500"></div>
+            <p class="mt-4 text-gray-600 dark:text-gray-400 font-medium">Yükleniyor...</p>
         </div>
-        <!-- footer start-->
-        @include('layouts.footer') 
-        
-      </div>
     </div>
-    <!-- latest jquery-->
-    @include('layouts.script')  
-    <!-- Plugin used-->
 
-    {{-- <script type="text/javascript">
-      if ($(".page-wrapper").hasClass("horizontal-wrapper")) {
-            $(".according-menu.other" ).css( "display", "none" );
-            $(".sidebar-submenu" ).css( "display", "block" );
-      }
-    </script> --}}
-  </body>
+    <div class="flex h-full" x-data="{ sidebarOpen: true, mobileMenuOpen: false }">
+        
+        <!-- Sidebar -->
+        @include('layouts.sidebar')
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Header -->
+            @include('layouts.header')
+            
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto scrollbar-thin bg-gray-50 dark:bg-gray-900">
+                
+                <!-- Breadcrumb -->
+                <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            @yield('breadcrumb-title')
+                        </div>
+                        <nav class="flex" aria-label="Breadcrumb">
+                            <ol class="flex items-center space-x-2">
+                                <li>
+                                    <a href="{{ route('/') }}" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <i class="fas fa-home"></i>
+                                    </a>
+                                </li>
+                                @yield('breadcrumb-items')
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="p-6">
+                    @yield('content')
+                </div>
+                
+            </main>
+            
+            <!-- Footer -->
+            @include('layouts.footer')
+            
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    @yield('script')
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
 </html>
