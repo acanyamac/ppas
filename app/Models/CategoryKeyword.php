@@ -16,11 +16,14 @@ class CategoryKeyword extends Model
         'is_case_sensitive',
         'priority',
         'is_active',
+        'is_alert',
+        'alert_unit_id',
     ];
 
     protected $casts = [
         'is_case_sensitive' => 'boolean',
         'is_active' => 'boolean',
+        'is_alert' => 'boolean',
         'priority' => 'integer',
     ];
 
@@ -32,6 +35,14 @@ class CategoryKeyword extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Bildirim gidecek birim
+     */
+    public function alertUnit()
+    {
+        return $this->belongsTo(Unit::class, 'alert_unit_id');
     }
 
     public function overrides()

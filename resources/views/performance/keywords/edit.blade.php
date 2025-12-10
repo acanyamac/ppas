@@ -158,6 +158,42 @@
                                         <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Aktif</span>
                                     </label>
                                 </div>
+
+                                <!-- Alert Settings -->
+                                <div x-data="{ isAlert: {{ $keyword->is_alert ? 'true' : 'false' }} }" class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <label class="flex items-center cursor-pointer mb-3">
+                                        <input type="checkbox" 
+                                               name="is_alert" 
+                                               class="form-checkbox h-5 w-5 text-red-600 rounded" 
+                                               value="1" 
+                                               x-model="isAlert"
+                                               {{ old('is_alert', $keyword->is_alert) ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Uyarı Gönder (Alert)
+                                        </span>
+                                    </label>
+
+                                    <div x-show="isAlert" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 scale-95"
+                                         x-transition:enter-end="opacity-100 scale-100"
+                                         class="pl-7">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Bildirim Gidecek Birim <span class="text-red-500">*</span>
+                                        </label>
+                                        <select name="alert_unit_id" class="form-select text-sm w-full" :required="isAlert">
+                                            <option value="">Birim seçiniz...</option>
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->id }}" {{ old('alert_unit_id', $keyword->alert_unit_id) == $unit->id ? 'selected' : '' }}>
+                                                    {{ $unit->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <p class="mt-1 text-xs text-red-500">
+                                            Eşleşme olduğunda bu birimdeki kullanıcılara bildirim gider.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

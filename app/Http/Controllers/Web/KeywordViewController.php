@@ -31,16 +31,28 @@ class KeywordViewController extends Controller
     public function create()
     {
         $categories = Category::active()->get();
-        return view('performance.keywords.create', compact('categories'));
+        $units = Unit::orderBy('name')->get();
+        return view('performance.keywords.create', compact('categories', 'units'));
     }
 
     public function store(Request $request)
     {
+        $input = $request->all();
+        
+        // Checkbox gelmezse false yap (is_case_sensitive, is_alert)
+        $input['is_case_sensitive'] = $request->has('is_case_sensitive');
+        $input['is_active'] = $request->has('is_active');
+        $input['is_alert'] = $request->has('is_alert');
+
+        $request->merge($input);
+
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'keyword' => 'required|string|max:255',
             'match_type' => 'required|in:exact,contains,starts_with,ends_with,regex',
             'priority' => 'required|integer|min:1|max:10',
+            'is_alert' => 'boolean',
+            'alert_unit_id' => 'required_if:is_alert,true|nullable|exists:units,id',
         ]);
 
         $this->keywordService->create($request->all());
@@ -56,18 +68,29 @@ class KeywordViewController extends Controller
             
         $categories = Category::active()->get();
         $units = Unit::orderBy('name')->get();
-        $computerUsers = ComputerUser::orderBy('name')->get(); // name null olabilir gerçi
+        $computerUsers = ComputerUser::orderBy('name')->get();
         
         return view('performance.keywords.edit', compact('keyword', 'categories', 'units', 'computerUsers'));
     }
 
     public function update(Request $request, string $id)
     {
+         $input = $request->all();
+        
+        // Checkbox gelmezse false yap
+        $input['is_case_sensitive'] = $request->has('is_case_sensitive');
+        $input['is_active'] = $request->has('is_active');
+        $input['is_alert'] = $request->has('is_alert');
+
+        $request->merge($input);
+
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'keyword' => 'required|string|max:255',
             'match_type' => 'required|in:exact,contains,starts_with,ends_with,regex',
             'priority' => 'required|integer|min:1|max:10',
+            'is_alert' => 'boolean',
+            'alert_unit_id' => 'required_if:is_alert,true|nullable|exists:units,id',
         ]);
 
         $this->keywordService->update($id, $request->all());

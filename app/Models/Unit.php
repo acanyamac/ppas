@@ -15,4 +15,10 @@ class Unit extends Model
     public function parentUnit() {
         return $this->belongsTo($this, 'parent_id');
     }
+
+    public function users()
+    {
+        // Unit -> UserDetail -> User
+        return $this->hasManyThrough(User::class, UserDetail::class, 'unit_id', 'id', 'id', 'user_id');
+    }
 }

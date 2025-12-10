@@ -49,13 +49,16 @@ class AutoTaggingService
                 ]);
                 
                 $taggedCount++;
+                
+                // Alert kontrolü
+                $this->checkAndSendAlert($activity, $match['keyword_model']);
             }
         }
         
         Log::info("Aktivite taglendi", [
             'activity_id' => $activityId,
             'tagged_count' => $taggedCount,
-            'matches' => $matches,
+            'matches' => \Illuminate\Support\Arr::except($matches, ['keyword_model']), // Log'da model objesini gizle
         ]);
         
         return [
@@ -183,6 +186,7 @@ class AutoTaggingService
                         'category_id' => $targetCategoryId,
                         'category_name' => $targetCategoryName,
                         'keyword' => $keyword->keyword,
+                        'keyword_model' => $keyword, // Notification için gerekli
                         'match_type' => $keyword->match_type,
                         'matched_field' => $matchedField,
                         'confidence_score' => $keyword->getConfidenceScore(),
@@ -193,6 +197,34 @@ class AutoTaggingService
         }
         
         return $matches;
+    }
+
+    /**
+     * Alert şartlarını kontrol eder ve bildirim gönderir
+     */
+    protected function checkAndSendAlert(Activity $activity, CategoryKeyword $keyword)
+    {
+        if ($keyword->is_alert && $keyword->alert_unit_id) {
+            
+            // Notification gönderilecek kullanıcıları bul
+            $alertUnit = \App\Models\Unit::find($keyword->alert_unit_id);
+            
+            if ($alertUnit) {
+                // Birimdeki kullanıcıları al
+                $users = $alertUnit->users;
+                
+                // Bildirimi gönder
+                if ($users->count() > 0) {
+                    \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\KeywordAlertNotification($activity, $keyword));
+                    
+                    Log::info("Keyword alert bildirimi gönderildi", [
+                        'keyword' => $keyword->keyword,
+                        'unit' => $alertUnit->name,
+                        'user_count' => $users->count()
+                    ]);
+                }
+            }
+        }
     }
 
     /**
