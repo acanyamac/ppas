@@ -192,6 +192,10 @@ class AutoTaggingService
                         'confidence_score' => $keyword->getConfidenceScore(),
                         'priority' => $keyword->priority,
                     ];
+                    
+                    // En yüksek öncelikli eşleşmeyi bulduk, diğerlerine bakmaya gerek yok
+                    // Tek bir kategoriye taglenmesi istendiği için döngüyü kırıyoruz
+                    break;
                 }
             }
         }
