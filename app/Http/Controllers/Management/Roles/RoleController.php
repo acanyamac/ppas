@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Management\Roles;
 
-use App\Models\SidebarMenu;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -28,10 +27,28 @@ class RoleController extends Controller
     public function create()
     {
         $roles = Role::all();
-        $menus = SidebarMenu::whereNotIn('name', ['Yönetimsel İşlemler'])->get();
-        $subMenus = SidebarMenu::whereNotIn('name', ['Yönetimsel İşlemler'])->whereNot('parent_id', 0)->get();
-        //dd($subMenus);
-        return view('yonetimsel-islemler.roller.add', compact('roles', 'menus', 'subMenus'));
+        
+        // Get all permissions from Spatie
+        $allPermissions = Permission::all();
+        
+        // Group permissions by category
+        $permissionGroups = [
+            'Performans Modülü' => [
+                'Kategori Yönetimi',
+                'Keyword Yönetimi',
+                'Aktivite Yönetimi',
+                'İstatistikler',
+                'Bilgisayar Kullanıcıları',
+            ],
+            'Yönetimsel İşlemler' => [
+                'Birim Yönetimi',
+                'Ünvan Yönetimi',
+                'Kullanıcı Yönetimi',
+                'Rol Yönetimi',
+            ],
+        ];
+        
+        return view('yonetimsel-islemler.roller.add', compact('roles', 'permissionGroups', 'allPermissions'));
     }
 
      //Rol ekleme
@@ -52,28 +69,26 @@ class RoleController extends Controller
     //Role izinleri ekleme
     public function store(Request $request)
     {
-        
-
-        //dd($request->except('_token','role_id'));
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
 
         $role = Role::findById($request->role_id);
-
-        // Role ait tüm izinleri kaldırıp hali hazırda seçili olanları tekrar ekliyeceğiz
-        $role->permissions()->detach();
-
-
-        //Burada izin isimlerine göre ekleme yaptığım için biraz dolanbaçlı oldu
-        foreach ($request->except('_token', 'role_id') as $permissionName => $value) {
-
-            //ismlerdeki boşluğu sistem kaldırmak için bu kodu yazdım
-            $formattedData = str_replace('_', ' ', $permissionName);
-
-            $permissionData = ['name' => $formattedData];
-            $permission = Permission::updateOrCreate($permissionData);
-            $role->givePermissionTo($permission);
+        
+        // Checkbox'lardan gelen permission isimlerini topluyoruz
+        $permissionNames = [];
+        foreach ($request->except(['_token', 'role_id']) as $key => $value) {
+            // Checkbox'lar 'on' değeri ile gelir
+            if ($value === 'on') {
+                // Underscore'ları boşluğa çeviriyoruz (view'dan böyle geliyor)
+                $permissionNames[] = str_replace('_', ' ', $key);
+            }
         }
+        
+        // syncPermissions: Var olanları tutar, olmayanları ekler, işaretlenmeyenleri kaldırır
+        $role->syncPermissions($permissionNames);
 
-        return  redirect()->back()->withInput()->with('message', 'Rol izinleri güncellendi');
+        return redirect()->back()->with('message', 'Rol izinleri başarıyla güncellendi.');
     }
 
     /**

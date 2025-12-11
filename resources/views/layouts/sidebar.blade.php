@@ -44,6 +44,7 @@
             </div>
 
             <!-- Yönetimsel İşlemler -->
+            @if(auth()->user()->can('Birim Yönetimi') || auth()->user()->can('Ünvan Yönetimi') || auth()->user()->hasRole('Super Admin|Admin'))
             <div x-data="{ open: false }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
@@ -55,7 +56,7 @@
                        :class="{ 'rotate-180': open }"></i>
                 </button>
                 <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
-                    @unlessrole('Anket Kullanıcısı')
+                    @can('Birim Yönetimi')
                         <a href="{{ route('birim.index') }}" 
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
                             Birimler
@@ -64,6 +65,9 @@
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
                             Birim Ekle
                         </a>
+                    @endcan
+                    
+                    @can('Ünvan Yönetimi')
                         <a href="{{ route('unvan.index') }}" 
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
                             Ünvanlar
@@ -72,12 +76,16 @@
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
                             Ünvan Ekle
                         </a>
-                    @endunlessrole
+                    @endcan
                     
                     @role('Super Admin|Admin')
                         <a href="{{ route('roller.index') }}" 
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
                             Roller
+                        </a>
+                        <a href="{{ route('roller.create') }}" 
+                           class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
+                            Rol İzinleri
                         </a>
                         <a href="{{ route('kullanicilar.index') }}" 
                            class="block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all">
@@ -86,6 +94,7 @@
                     @endrole
                 </div>
             </div>
+            @endif
 
             <!-- Section Divider -->
             <div class="pt-4 pb-2">
@@ -93,6 +102,7 @@
             </div>
 
             <!-- Kategori Yönetimi -->
+            @can('Kategori Yönetimi')
             <div x-data="{ open: {{ request()->routeIs('categories.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('categories.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
@@ -114,8 +124,10 @@
                     </a>
                 </div>
             </div>
+            @endcan
 
             <!-- Keyword Yönetimi -->
+            @can('Keyword Yönetimi')
             <div x-data="{ open: {{ request()->routeIs('keywords.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('keywords.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
@@ -145,8 +157,10 @@
                     </a>
                 </div>
             </div>
+            @endcan
 
             <!-- Aktivite Yönetimi -->
+            @can('Aktivite Yönetimi')
             <div x-data="{ open: {{ request()->routeIs('activities.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('activities.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
@@ -176,8 +190,10 @@
                     </a>
                 </div>
             </div>
+            @endcan
 
             <!-- İstatistik & Raporlar -->
+            @can('İstatistikler')
             <div x-data="{ open: {{ request()->routeIs('statistics.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('statistics.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
@@ -207,8 +223,10 @@
                     </a>
                 </div>
             </div>
+            @endcan
 
             <!-- Kullanıcı Yönetimi -->
+            @can('Bilgisayar Kullanıcıları')
             <div x-data="{ open: {{ request()->routeIs('computer-users.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" 
                         class="group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('computer-users.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
@@ -226,6 +244,7 @@
                     </a>
                 </div>
             </div>
+            @endcan
 
         </nav>
 

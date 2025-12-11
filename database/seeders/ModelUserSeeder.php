@@ -15,7 +15,7 @@ class ModelUserSeeder extends Seeder
     {
         DB::table('model_has_roles')->insert([
             
-            'role_id' => 7,
+            'role_id' => 1,
             'model_type'=>'app\models\user',
             'model_id'=>1,
             

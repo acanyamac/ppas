@@ -52,7 +52,9 @@
                     title="Bildirimler"
                 >
                     <i class="fas fa-bell text-lg"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    @if(auth()->user()->unreadNotifications->count() > 0)
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    @endif
                 </button>
                 
                 <!-- Notifications Dropdown -->
@@ -63,31 +65,51 @@
                     class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
                     x-cloak
                 >
-                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="font-semibold text-gray-900 dark:text-white">Bildirimler</h3>
+                        @if(auth()->user()->unreadNotifications->count() > 0)
+                            <form action="{{ route('notifications.readAll') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-xs text-primary-500 hover:text-primary-700 font-medium">Tümünü Okundu Say</button>
+                            </form>
+                        @endif
                     </div>
                     <div class="max-h-96 overflow-y-auto scrollbar-thin">
-                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                                <div class="flex-1">
-                                    <p class="text-sm text-gray-900 dark:text-white">Yeni aktivite eklendi</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">2 dakika önce</p>
+                        @forelse(auth()->user()->unreadNotifications as $notification)
+                            <div class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0 relative group">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900 dark:text-white truncate">
+                                            {{ $notification->data['message'] ?? 'Yeni Bildirim' }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ $notification->created_at->diffForHumans() }}
+                                        </p>
+                                        @if(isset($notification->data['url']))
+                                            <a href="{{ route('dokuman.download', ['path' => $notification->data['url']]) }}" class="text-xs text-primary-500 hover:underline mt-1 block">
+                                                Dosyayı İndir
+                                            </a>
+                                        @endif
+                                    </div>
+                                    <!-- Mark as read for individual item -->
+                                    <form action="{{ route('notifications.read', $notification->id) }}" method="POST" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        @csrf
+                                        <button type="submit" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" title="Okundu işaretle">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                        </a>
-                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            <div class="flex items-start gap-3">
-                                <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                                <div class="flex-1">
-                                    <p class="text-sm text-gray-900 dark:text-white">Tagleme işlemi tamamlandı</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 saat önce</p>
-                                </div>
+                        @empty
+                            <div class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <i class="far fa-bell-slash text-2xl mb-2 block"></i>
+                                <span class="text-sm">Yeni bildirim yok</span>
                             </div>
-                        </a>
+                        @endforelse
                     </div>
                     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-center">
-                        <a href="#" class="text-sm text-primary-500 hover:text-primary-700 font-medium">Tümünü Gör</a>
+                        <a href="{{ route('notifications.index') }}" class="text-sm text-primary-500 hover:text-primary-700 font-medium">Tümünü Gör</a>
                     </div>
                 </div>
             </div>

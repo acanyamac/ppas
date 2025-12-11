@@ -1,2 +1,2 @@
 
-@vite(['public/assets/scss/app.scss'])
+@vite(['resources/css/app.css', 'resources/js/app.js'])
