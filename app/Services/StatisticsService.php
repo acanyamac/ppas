@@ -378,6 +378,16 @@ class StatisticsService
             $query->where('activities.activity_type', $filters['activity_type']);
         }
         
+        if (!empty($filters['unit_id'])) {
+            $query->whereExists(function ($q) use ($filters) {
+                $q->select(DB::raw(1))
+                  ->from('computer_users')
+                  ->whereColumn('computer_users.username', 'activities.username')
+                  ->whereColumn('computer_users.motherboard_uuid', 'activities.motherboard_uuid')
+                  ->where('computer_users.unit_id', $filters['unit_id']);
+            });
+        }
+        
         return $query;
     }
     /**

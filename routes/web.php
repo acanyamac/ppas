@@ -124,6 +124,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Computer Users
         Route::resource('computer-users', \App\Http\Controllers\Web\ComputerUserController::class)
             ->middleware('permission:Bilgisayar Kullanıcıları');
+
+        // Unit Statistics
+        Route::resource('unit-statistics', \App\Http\Controllers\Web\UnitStatisticsController::class)
+            ->only(['index', 'show'])
+            ->middleware('permission:İstatistikler');
     });
     
     Route::resource('birim', UnitController::class)->middleware('permission:Birim Yönetimi');

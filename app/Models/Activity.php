@@ -43,6 +43,16 @@ class Activity extends Model
     // İlişki
 
     /**
+     * Aktivitenin ait olduğu bilgisayar kullanıcısı
+     */
+    public function computerUser()
+    {
+         return $this->belongsTo(ComputerUser::class, 'username', 'username')
+                    ->where('motherboard_uuid', $this->motherboard_uuid);
+    }
+
+
+    /**
      * Aktivitenin ait olduğu kategoriler (many-to-many)
      */
     public function categories()
