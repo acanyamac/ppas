@@ -21,4 +21,9 @@ class Unit extends Model
         // Unit -> UserDetail -> User
         return $this->hasManyThrough(User::class, UserDetail::class, 'unit_id', 'id', 'id', 'user_id');
     }
+
+    public function computerUsers()
+    {
+        return $this->hasMany(ComputerUser::class);
+    }
 }

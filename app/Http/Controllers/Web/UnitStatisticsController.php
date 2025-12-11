@@ -20,7 +20,7 @@ class UnitStatisticsController extends Controller
     public function index()
     {
         // Birim listesi ve özet istatistikleri
-        $units = Unit::withCount('users') // Computer Users ilişkisi Unit modelinde 'users' olarak tanımlı olmalı
+        $units = Unit::withCount('computerUsers') 
             ->orderBy('name')
             ->get();
 
@@ -47,7 +47,7 @@ class UnitStatisticsController extends Controller
 
     public function show($id, Request $request)
     {
-        $unit = Unit::findOrFail($id);
+        $unit = Unit::withCount('computerUsers')->findOrFail($id);
         
         // Filtreleri hazırla
         $filters = $request->all();

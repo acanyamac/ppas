@@ -57,7 +57,7 @@
                         </td>
                         <td>
                             <span class="badge badge-light-primary">
-                                <i class="fas fa-users mr-1"></i> {{ $unit->users_count }}
+                                <i class="fas fa-users mr-1"></i> {{ $unit->computer_users_count }}
                             </span>
                         </td>
                         <td>
